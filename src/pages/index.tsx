@@ -87,7 +87,7 @@ const Home: NextPage = () => {
                     </div>
                 </div>
                 <div className='flex-1'>
-                    <input placeholder='Search Twitter' />
+                    <input placeholder='Search Twitty' />
                 </div>
             </main>
         </>

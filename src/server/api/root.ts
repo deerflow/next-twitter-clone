@@ -1,6 +1,11 @@
+import { prisma } from '~/server/db';
 import { createTRPCRouter } from '~/server/api/trpc';
 import users from './routers/users';
 import posts from './routers/posts';
+import { type GetServerSidePropsContext } from 'next';
+import { getAuth } from '@clerk/nextjs/server';
+import SuperJSON from 'superjson';
+import { createServerSideHelpers } from '@trpc/react-query/server';
 
 /**
  * This is the primary router for your server.
@@ -14,3 +19,10 @@ export const appRouter = createTRPCRouter({
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
+
+export const getSSG = (context: GetServerSidePropsContext) =>
+    createServerSideHelpers({
+        router: appRouter,
+        ctx: { prisma, auth: getAuth(context.req), ip: context.req.headers['x-forwarded-for'] },
+        transformer: SuperJSON,
+    });

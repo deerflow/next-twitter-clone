@@ -1,6 +1,7 @@
 import clerkClient from '@clerk/clerk-sdk-node';
 import { TRPCError } from '@trpc/server';
-import { createTRPCRouter, privateProcedure } from '~/server/api/trpc';
+import { createTRPCRouter, publicProcedure, privateProcedure } from '~/server/api/trpc';
+import { z } from 'zod';
 
 const users = createTRPCRouter({
     getEmail: privateProcedure.query(async ({ ctx }) => {
@@ -9,6 +10,11 @@ const users = createTRPCRouter({
             throw new TRPCError({ message: 'User not found', code: 'NOT_FOUND' });
         }
         return { email: user.emailAddresses[0]?.emailAddress };
+    }),
+    get: publicProcedure.input(z.object({ username: z.string() })).query(async ({ input }) => {
+        const user = (await clerkClient.users.getUserList({ username: [input.username] }))[0];
+        if (!user) throw new TRPCError({ message: 'User not found', code: 'NOT_FOUND' });
+        return { user };
     }),
 });
 
