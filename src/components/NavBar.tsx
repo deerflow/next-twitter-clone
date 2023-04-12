@@ -1,26 +1,43 @@
 import { type FC } from 'react';
 import Link from 'next/link';
 import { AiOutlineUser, AiOutlineHome } from 'react-icons/ai';
+import logo from '../assets/favicon.svg';
+import Image, { type StaticImageData } from 'next/image';
+import { useRouter } from 'next/router';
 
 const NavBar: FC = () => {
+    const router = useRouter();
+
     return (
-        <nav>
-            <ul>
-                <li>
-                    <Link href='/'>
-                        <AiOutlineHome />
-                        <p>Home</p>
+        <nav className='mt-6 flex-1 text-xl'>
+            <div className='flex justify-center'>
+                <ul>
+                    <Link
+                        href='/'
+                        className='my-0.5 ml-1 flex w-fit rounded-full p-2 transition-colors duration-200 hover:bg-gray-200'
+                    >
+                        <Image src={logo as StaticImageData} alt='Main Logo' width={36} className='' />
                     </Link>
-                </li>
-                <li>
-                    <Link href='/'>
-                        <AiOutlineUser />
-                        <p>Profile</p>
-                    </Link>
-                </li>
-            </ul>
+                    {links.map(link => (
+                        <li key={link.href}>
+                            <Link
+                                href={link.href}
+                                className='my-0.5 flex w-fit items-center rounded-full py-3 pl-4 pr-5 transition-colors duration-200 hover:bg-gray-200'
+                            >
+                                <link.icon className='mr-4 h-7 w-7' />
+                                <p className={`${router.route === link.href ? 'font-bold' : ''}`}>{link.label}</p>
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </nav>
     );
 };
+
+const links = [
+    { href: '/', label: 'Home', icon: AiOutlineHome },
+    { href: '/profile', label: 'Profile', icon: AiOutlineUser },
+];
 
 export default NavBar;
