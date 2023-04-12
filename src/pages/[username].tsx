@@ -1,6 +1,7 @@
 import { type NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { api } from '~/utils/api';
+import Layout from '~/components/Layout';
 
 /*export const getServerSideProps: GetServerSideProps = async context => {
     const ssg = getSSG(context);
@@ -18,7 +19,7 @@ const ProfilePage: NextPage = () => {
     const router = useRouter();
     const username = router.query.username as string;
     const getUser = api.users.get.useQuery({ username }, { enabled: router.isReady });
-    return <div />;
+    return <Layout></Layout>;
 };
 
 export default ProfilePage;
