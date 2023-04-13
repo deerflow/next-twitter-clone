@@ -7,6 +7,7 @@ import userPlaceholder from '../assets/user-placeholder.jpeg';
 import Image from 'next/image';
 import { useClerk } from '@clerk/nextjs';
 import Layout from '~/components/Layout';
+import PostsList from '~/components/PostsList';
 
 const Home: NextPage = () => {
     const { signOut } = useClerk();
@@ -32,7 +33,7 @@ const Home: NextPage = () => {
             </Head>
             <Layout>
                 <div className='w-[600px]'>
-                    <p>{getCurrentUser.data?.user.emailAddresses?.[0]?.emailAddress}</p>
+                    <p>{getCurrentUser.data?.email}</p>
                     <button onClick={() => void signOut()}>Sign Out</button>
                     <form
                         className='flex justify-between border-[1px] border-solid border-gray-200 p-4'
@@ -68,25 +69,8 @@ const Home: NextPage = () => {
                         </div>
                     </form>
 
-                    <div>
-                        {getPosts.data?.map(post => (
-                            <div
-                                key={post.id}
-                                className='flex break-words border-[1px] border-t-0 border-solid border-gray-200 p-4 transition-colors duration-200 hover:bg-gray-100'
-                            >
-                                <Image
-                                    src={userPlaceholder}
-                                    alt='Default user image'
-                                    width={48}
-                                    height={48}
-                                    className='mr-3 h-12 rounded-full'
-                                />
-                                <div className='min-w-0'>
-                                    <p className='break-words text-lg font-semibold'>{post.author?.username}</p>
-                                    <p className='whitespace-pre-line break-words'>{post.content}</p>
-                                </div>
-                            </div>
-                        ))}
+                    <div className='border-[1px] border-y-0 border-solid'>
+                        <PostsList posts={getPosts.data} />
                     </div>
                 </div>
             </Layout>
