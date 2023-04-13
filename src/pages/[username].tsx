@@ -2,14 +2,14 @@ import { type NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { api } from '~/utils/api';
 import Layout from '~/components/Layout';
-import { AiOutlineArrowLeft } from 'react-icons/ai';
+import { AiOutlineArrowLeft, AiOutlineClose } from 'react-icons/ai';
 import Link from 'next/link';
 import Image from 'next/image';
 import Button from '~/components/Button';
 import { useAuth } from '@clerk/nextjs';
 import Head from 'next/head';
 import LoadingPage from '~/components/LoadingPage';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import PostsList from '~/components/PostsList';
 
 /*export const getServerSideProps: GetServerSideProps = async context => {
@@ -41,6 +41,9 @@ const ProfilePage: NextPage = () => {
     const username = router.query.username as string;
     const getUser = api.users.get.useQuery({ username }, { enabled: router.isReady });
     const getUserPosts = api.posts.getUserPosts.useQuery({ username });
+
+    const [isEditing, setIsEditing] = useState(false);
+
     const PageHead = useMemo(
         () => (
             <Head>
@@ -84,7 +87,7 @@ const ProfilePage: NextPage = () => {
                             />
                             {getCurrentUser.data && getCurrentUser.data?.id === getUser.data?.id && (
                                 <div>
-                                    <Button>Edit profile</Button>
+                                    <Button onClick={() => setIsEditing(true)}>Edit profile</Button>
                                 </div>
                             )}
                         </div>
@@ -98,6 +101,32 @@ const ProfilePage: NextPage = () => {
                     <PostsList posts={getUserPosts.data} isLoading={getUserPosts.isLoading} />
                 </div>
             </Layout>
+            {isEditing && (
+                <div
+                    className='fixed left-0 top-0 flex h-screen w-full items-center justify-center bg-black/30 py-5'
+                    onClick={() => setIsEditing(false)}
+                >
+                    <div onClick={e => e.stopPropagation()} className='w-[585px] bg-white px-4 py-2.5'>
+                        <div className='flex justify-between'>
+                            <div className='flex items-center'>
+                                <button>
+                                    <AiOutlineClose className='h-5 w-5' />
+                                </button>
+                                <h2 className='pl-8 text-xl font-semibold'>Edit profile</h2>
+                            </div>
+                            <Button black>Save</Button>
+                        </div>
+                        <Image
+                            className='rounded-full'
+                            src={getUser.data?.avatar as string}
+                            alt='Profile picture'
+                            width={100}
+                            height={100}
+                        />
+                        <input />
+                    </div>
+                </div>
+            )}
         </>
     );
 };
