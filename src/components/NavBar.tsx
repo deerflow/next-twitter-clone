@@ -1,12 +1,22 @@
-import { type FC } from 'react';
+import { type FC, useMemo } from 'react';
 import Link from 'next/link';
 import { AiOutlineUser, AiOutlineHome } from 'react-icons/ai';
 import logo from '../assets/favicon.svg';
 import Image, { type StaticImageData } from 'next/image';
 import { useRouter } from 'next/router';
+import { api } from '~/utils/api';
 
 const NavBar: FC = () => {
+    const getCurrentUser = api.users.getCurrent.useQuery();
     const router = useRouter();
+
+    const links = useMemo(
+        () => [
+            { href: '/', label: 'Home', icon: AiOutlineHome },
+            { href: `/${getCurrentUser.data?.user.username || ''}`, label: 'Profile', icon: AiOutlineUser },
+        ],
+        [getCurrentUser.data?.user.username]
+    );
 
     return (
         <nav className='mt-6 flex-1 text-xl'>
@@ -34,10 +44,5 @@ const NavBar: FC = () => {
         </nav>
     );
 };
-
-const links = [
-    { href: '/', label: 'Home', icon: AiOutlineHome },
-    { href: '/profile', label: 'Profile', icon: AiOutlineUser },
-];
 
 export default NavBar;
