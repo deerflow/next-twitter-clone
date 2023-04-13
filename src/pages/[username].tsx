@@ -12,6 +12,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Button from '~/components/Button';
 import PostsList from '~/components/PostsList';
+import { useAuth } from '@clerk/nextjs';
 
 export const getServerSideProps: GetServerSideProps = async context => {
     const ssg = createServerSideHelpers({
@@ -36,10 +37,11 @@ export const getServerSideProps: GetServerSideProps = async context => {
 };
 
 const ProfilePage: NextPage = () => {
+    const auth = useAuth();
+    const getCurrentUser = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const router = useRouter();
     const username = router.query.username as string;
     const getUser = api.users.get.useQuery({ username }, { enabled: router.isReady });
-    const getCurrentUser = api.users.getCurrent.useQuery();
     const getUserPosts = api.posts.getUserPosts.useQuery({ username });
 
     if (getUser.isLoading || getCurrentUser.isLoading || getUserPosts.isLoading) {

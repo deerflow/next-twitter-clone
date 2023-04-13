@@ -2,18 +2,18 @@ import { type NextPage } from 'next';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { api } from '~/utils/api';
-import TextAreaAutosize from 'react-textarea-autosize';
-import userPlaceholder from '../assets/user-placeholder.jpeg';
+import TextAreaAutoSize from 'react-textarea-autosize';
 import Image from 'next/image';
-import { useClerk } from '@clerk/nextjs';
+import { useAuth, useClerk } from '@clerk/nextjs';
 import Layout from '~/components/Layout';
 import PostsList from '~/components/PostsList';
 
 const Home: NextPage = () => {
     const { signOut } = useClerk();
+    const auth = useAuth();
     const context = api.useContext();
 
-    const getCurrentUser = api.users.getCurrent.useQuery();
+    const getCurrentUser = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const getPosts = api.posts.getAll.useQuery();
     const createPost = api.posts.create.useMutation();
 
@@ -33,45 +33,46 @@ const Home: NextPage = () => {
             </Head>
             <Layout>
                 <div className='w-[600px]'>
-                    <p>{getCurrentUser.data?.email}</p>
-                    <button onClick={() => void signOut()}>Sign Out</button>
-                    <form
-                        className='flex justify-between border-[1px] border-solid border-gray-200 p-4'
-                        onSubmit={e => {
-                            e.preventDefault();
-                            createPost.mutate(
-                                { content },
-                                {
-                                    onSuccess: () => {
-                                        setContent('');
-                                        void context.posts.getAll.invalidate();
-                                    },
-                                }
-                            );
-                        }}
-                    >
-                        <Image
-                            src={userPlaceholder}
-                            alt='Default user image'
-                            width={48}
-                            className='mr-3 h-12 rounded-full'
-                        />
-                        <TextAreaAutosize
-                            value={content}
-                            onChange={e => setContent(e.currentTarget.value)}
-                            placeholder="What's happening?"
-                            className='mt-2.5 w-full resize-none text-xl placeholder-gray-600 outline-none'
-                        />
-                        <div>
-                            <button
-                                className='rounded-full bg-blue-500 px-4 py-2 font-medium text-white disabled:bg-blue-200'
-                                type='submit'
-                                disabled={isTweetButtonDisabled}
-                            >
-                                Tweet
-                            </button>
-                        </div>
-                    </form>
+                    {auth.isSignedIn && (
+                        <form
+                            className='flex justify-between border-[1px] border-solid border-gray-200 p-4'
+                            onSubmit={e => {
+                                e.preventDefault();
+                                createPost.mutate(
+                                    { content },
+                                    {
+                                        onSuccess: () => {
+                                            setContent('');
+                                            void context.posts.getAll.invalidate();
+                                        },
+                                    }
+                                );
+                            }}
+                        >
+                            <Image
+                                src={getCurrentUser.data?.avatar}
+                                alt='Default user image'
+                                width={48}
+                                height={48}
+                                className='mr-3 h-12 rounded-full'
+                            />
+                            <TextAreaAutoSize
+                                value={content}
+                                onChange={e => setContent(e.currentTarget.value)}
+                                placeholder="What's happening?"
+                                className='mt-2.5 w-full resize-none text-xl placeholder-gray-600 outline-none'
+                            />
+                            <div>
+                                <button
+                                    className='rounded-full bg-blue-500 px-4 py-2 font-medium text-white disabled:bg-blue-200'
+                                    type='submit'
+                                    disabled={isTweetButtonDisabled}
+                                >
+                                    Tweet
+                                </button>
+                            </div>
+                        </form>
+                    )}
 
                     <div className='border-[1px] border-y-0 border-solid'>
                         <PostsList posts={getPosts.data} />
