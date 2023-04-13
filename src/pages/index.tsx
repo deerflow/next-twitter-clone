@@ -18,10 +18,10 @@ const Home: NextPage = () => {
     const createPost = api.posts.create.useMutation();
 
     const [content, setContent] = useState('');
-    const [tweetButtonDisabled, setTweetButtonDisabled] = useState(true);
+    const [isTweetButtonDisabled, setIsTweetButtonDisabled] = useState(true);
 
     useEffect(() => {
-        setTweetButtonDisabled(content.length === 0);
+        setIsTweetButtonDisabled(content.length === 0);
     }, [content.length]);
 
     return (
@@ -63,7 +63,11 @@ const Home: NextPage = () => {
                             className='mt-2.5 w-full resize-none text-xl placeholder-gray-600 outline-none'
                         />
                         <div>
-                            <button className='rounded-full bg-blue-500 px-4 py-2 font-medium text-white' type='submit'>
+                            <button
+                                className='rounded-full bg-blue-500 px-4 py-2 font-medium text-white disabled:bg-blue-200'
+                                type='submit'
+                                disabled={isTweetButtonDisabled}
+                            >
                                 Tweet
                             </button>
                         </div>
