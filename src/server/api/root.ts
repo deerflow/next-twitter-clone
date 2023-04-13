@@ -6,6 +6,7 @@ import { type GetServerSidePropsContext } from 'next';
 import { getAuth } from '@clerk/nextjs/server';
 import superjson from 'superjson';
 import { createServerSideHelpers } from '@trpc/react-query/server';
+import images from './routers/images';
 
 /**
  * This is the primary router for your server.
@@ -15,6 +16,7 @@ import { createServerSideHelpers } from '@trpc/react-query/server';
 export const appRouter = createTRPCRouter({
     users,
     posts,
+    images,
 });
 
 // export type definition of API
