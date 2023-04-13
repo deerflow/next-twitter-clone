@@ -8,13 +8,16 @@ import { useAuth } from '@clerk/nextjs';
 import Layout from '~/components/Layout';
 import PostsList from '~/components/PostsList';
 import LoadingPage from '~/components/LoadingPage';
-/*
-export const getServerSideProps: GetServerSideProps = async context => {
+
+/*export const getServerSideProps: GetServerSideProps = async context => {
     const ssg = createServerSideHelpers({
         router: appRouter,
         ctx: { prisma, auth: getAuth(context.req), ip: context.req.headers['x-forwarded-for'] },
         transformer: SuperJSON,
     });
+
+    await ssg.users.getCurrent.prefetch();
+    await ssg.posts.getAll.prefetch();
 
     return { props: { trpcState: ssg.dehydrate() } };
 };*/
