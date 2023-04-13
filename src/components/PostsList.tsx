@@ -2,8 +2,15 @@ import { type Post } from '@prisma/client';
 import { type FC } from 'react';
 import Image from 'next/image';
 import { type SimpleUser } from '~/types';
+import Spinner from './Spinner';
 
-const PostsList: FC<Props> = ({ posts }) => {
+const PostsList: FC<Props> = ({ posts, isLoading }) => {
+    if (isLoading)
+        return (
+            <div className='mt-5 flex justify-center'>
+                <Spinner />
+            </div>
+        );
     return posts && posts.length > 0 ? (
         <div>
             {posts.map(post => (
@@ -32,6 +39,7 @@ const PostsList: FC<Props> = ({ posts }) => {
 
 interface Props {
     posts?: (Omit<Post, 'author'> & { author: SimpleUser })[] | null;
+    isLoading?: boolean;
 }
 
 export default PostsList;

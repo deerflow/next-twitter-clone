@@ -95,8 +95,8 @@ const Home: NextPage = () => {
                         </form>
                     )}
 
-                    <div className='border-[1px] border-y-0 border-solid'>
-                        <PostsList posts={getPosts.data} />
+                    <div className={getPosts.isLoading ? '' : 'border-[1px] border-y-0 border-solid'}>
+                        <PostsList posts={getPosts.data} isLoading={getPosts.isLoading} />
                     </div>
                 </div>
             </Layout>
