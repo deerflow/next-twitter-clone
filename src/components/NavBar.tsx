@@ -13,7 +13,7 @@ const NavBar: FC = () => {
     const links = useMemo(
         () => [
             { href: '/', label: 'Home', icon: AiOutlineHome },
-            { href: `/${getCurrentUser.data?.user.username || ''}`, label: 'Profile', icon: AiOutlineUser },
+            { href: `/${getCurrentUser.data?.user.username || 'profile'}`, label: 'Profile', icon: AiOutlineUser },
         ],
         [getCurrentUser.data?.user.username]
     );
@@ -26,7 +26,7 @@ const NavBar: FC = () => {
                         href='/'
                         className='my-0.5 ml-1 flex w-fit rounded-full p-2 transition-colors duration-200 hover:bg-gray-200'
                     >
-                        <Image src={logo as StaticImageData} alt='Main Logo' width={36} className='' />
+                        <Image src={logo as StaticImageData} alt='Main Logo' width={36} />
                     </Link>
                     {links.map(link => (
                         <li key={link.href}>
