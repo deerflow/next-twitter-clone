@@ -1,5 +1,5 @@
 import { type FCChildren } from 'deerflow-utils/types';
-import { type HTMLAttributes } from 'react';
+import { type ButtonHTMLAttributes } from 'react';
 
 const Button: FCChildren<Props> = ({ children, black, ...props }) => {
     return (
@@ -14,7 +14,7 @@ const Button: FCChildren<Props> = ({ children, black, ...props }) => {
     );
 };
 
-interface Props extends HTMLAttributes<HTMLButtonElement> {
+interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
     black?: boolean;
 }
 

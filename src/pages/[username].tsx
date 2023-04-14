@@ -89,7 +89,7 @@ const ProfilePage: NextPage = () => {
                                 alt='Profile Picture'
                                 width={120}
                                 height={120}
-                                className='rounded-full'
+                                className='h-[120px] w-[120px] rounded-full object-cover object-center'
                             />
                             {getCurrentUser.data && getCurrentUser.data?.id === getUser.data?.id && (
                                 <div>

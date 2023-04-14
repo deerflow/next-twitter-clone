@@ -62,14 +62,14 @@ const NavBar: FC = () => {
                                 alt={`${getCurrentUser.data?.username as string}'s avatar`}
                                 width={48}
                                 height={48}
-                                className='rounded-full'
+                                className='h-12 w-12 rounded-full'
                             />
                             <div className='ml-2'>
                                 <p className='text-base font-semibold leading-4'>{getCurrentUser.data?.username}</p>
                                 <p className='text-sm text-gray-400'>@{getCurrentUser.data?.username}</p>
                             </div>
                         </div>
-                        <button onClick={() => auth.signOut()}>
+                        <button onClick={() => void auth.signOut()}>
                             <AiOutlineDisconnect />
                         </button>
                     </div>

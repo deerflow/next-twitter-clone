@@ -23,9 +23,10 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
                         alt='Default user image'
                         width={48}
                         height={48}
-                        className='mr-3 h-12 rounded-full'
+                        className='mr-3 h-12 w-12 rounded-full object-cover object-center'
                     />
-                    <div className='min-w-0'>
+
+                    <div className='w-[512px] min-w-0'>
                         <p className='break-words text-lg font-semibold'>{post.author?.username}</p>
                         <p className='whitespace-pre-line break-words'>{post.content}</p>
                     </div>

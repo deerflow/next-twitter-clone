@@ -84,9 +84,9 @@ const Home: NextPage = () => {
                                 value={content}
                                 onChange={e => setContent(e.currentTarget.value)}
                                 placeholder="What's happening?"
-                                className='mt-2.5 w-full resize-none text-xl placeholder-gray-600 outline-none'
+                                className='mt-2.5 w-[424px] resize-none text-xl placeholder-gray-600 outline-none'
                             />
-                            <div>
+                            <div className='ml-3'>
                                 <button
                                     className='rounded-full bg-blue-500 px-4 py-2 font-medium text-white disabled:bg-blue-200'
                                     type='submit'
