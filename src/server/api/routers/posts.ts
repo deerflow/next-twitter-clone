@@ -23,18 +23,27 @@ const posts = createTRPCRouter({
         });
         return postsWithAuthors;
     }),
-    create: privateProcedure
-        .input(z.object({ content: z.string().min(1).max(280) }))
-        .mutation(async ({ ctx, input }) => {
-            //await rateLimit({ ip: ctx.ip, key: 'createPost', tokens: 1, delayMs: 10000, redisClient: ctx.redisClient });
-            return ctx.prisma.post.create({ data: { content: input.content, author: ctx.auth.userId } });
-        }),
+
     getUserPosts: publicProcedure.input(z.object({ username: z.string() })).query(async ({ ctx, input }) => {
         const usersCaller = users.createCaller(ctx);
         const user = await usersCaller.get({ username: input.username });
         const posts = await ctx.prisma.post.findMany({ where: { author: user.id }, orderBy: { createdAt: 'desc' } });
         return posts.map(post => ({ ...post, author: user }));
     }),
+    getOne: publicProcedure.input(z.object({ postId: z.string() })).query(async ({ ctx, input }) => {
+        const post = await ctx.prisma.post.findUnique({ where: { id: input.postId } });
+        if (!post) throw new TRPCError({ message: 'Post not found', code: 'NOT_FOUND' });
+        const author = await clerkClient.users.getUser(post.author);
+        return {
+            ...post,
+            author,
+        };
+    }),
+    create: privateProcedure
+        .input(z.object({ content: z.string().min(1).max(280) }))
+        .mutation(async ({ ctx, input }) => {
+            return ctx.prisma.post.create({ data: { content: input.content, author: ctx.auth.userId } });
+        }),
     delete: privateProcedure.input(z.object({ postId: z.string() })).mutation(async ({ ctx, input }) => {
         const post = await ctx.prisma.post.findUnique({ where: { id: input.postId } });
         if (!post) throw new TRPCError({ message: 'Post not found', code: 'NOT_FOUND' });
