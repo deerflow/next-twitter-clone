@@ -27,7 +27,6 @@
         "react-hot-toast": "^2.4.0",
         "react-icons": "^4.8.0",
         "react-textarea-autosize": "^8.4.1",
-        "redis": "^4.6.5",
         "superjson": "1.12.2",
         "zod": "^3.21.4"
     },
