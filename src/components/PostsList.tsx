@@ -20,10 +20,12 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
                 <Spinner />
             </div>
         );
+
     return posts && posts.length > 0 ? (
         <div>
             {posts.map(post => (
-                <div
+                <Link
+                    href={`/${post.author.username}/${post.id}`}
                     key={post.id}
                     className='flex break-words border-b-[1px] border-solid border-gray-200 p-4 transition-colors duration-200 hover:bg-gray-100'
                 >
@@ -72,7 +74,7 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
                             )}
                         </button>
                     )}
-                </div>
+                </Link>
             ))}
         </div>
     ) : (

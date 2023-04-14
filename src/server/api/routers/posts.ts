@@ -36,7 +36,12 @@ const posts = createTRPCRouter({
         const author = await clerkClient.users.getUser(post.author);
         return {
             ...post,
-            author,
+            author: {
+                id: author.id,
+                username: author.username as string,
+                email: author.emailAddresses[0]?.emailAddress as string,
+                avatar: author.profileImageUrl,
+            },
         };
     }),
     create: privateProcedure
