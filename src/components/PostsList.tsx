@@ -1,8 +1,8 @@
 import { type Post } from '@prisma/client';
 import { type FC } from 'react';
 import Image from 'next/image';
-import { type SimpleUser } from '~/types';
 import Spinner from './Spinner';
+import { type RouterOutput } from '~/server/api/root';
 
 const PostsList: FC<Props> = ({ posts, isLoading }) => {
     if (isLoading)
@@ -38,7 +38,7 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
 };
 
 interface Props {
-    posts?: (Omit<Post, 'author'> & { author: SimpleUser })[] | null;
+    posts?: (Omit<Post, 'author'> & { author: RouterOutput['users']['get'] })[] | null;
     isLoading?: boolean;
 }
 

@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .input-container:has(input:focus) label {
+        transform: translate(0) scale(1);
+    }
+}

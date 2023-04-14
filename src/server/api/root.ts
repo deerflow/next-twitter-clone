@@ -7,6 +7,7 @@ import { getAuth } from '@clerk/nextjs/server';
 import superjson from 'superjson';
 import { createServerSideHelpers } from '@trpc/react-query/server';
 import images from './routers/images';
+import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server';
 
 /**
  * This is the primary router for your server.
@@ -19,12 +20,14 @@ export const appRouter = createTRPCRouter({
     images,
 });
 
-// export type definition of API
-export type AppRouter = typeof appRouter;
-
 export const getSSG = (context: GetServerSidePropsContext) =>
     createServerSideHelpers({
         router: appRouter,
         ctx: { prisma, auth: getAuth(context.req), ip: context.req.headers['x-forwarded-for'] },
         transformer: superjson,
     });
+
+// export type definition of API
+export type AppRouter = typeof appRouter;
+export type RouterInput = inferRouterInputs<AppRouter>;
+export type RouterOutput = inferRouterOutputs<AppRouter>;
