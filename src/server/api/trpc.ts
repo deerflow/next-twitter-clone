@@ -41,7 +41,7 @@ import redisClient from '../redis';
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
 export const createTRPCContext = (opts: CreateNextContextOptions) => {
-    return { prisma, auth: getAuth(opts.req), ip: opts.req.headers['x-forwarded-for'], redis: redisClient };
+    return { prisma, auth: getAuth(opts.req), ip: opts.req.headers['x-forwarded-for'] };
 };
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
