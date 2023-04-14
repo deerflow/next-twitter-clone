@@ -6,6 +6,7 @@ import { type RouterOutput } from '~/server/api/root';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { api } from '~/utils/api';
 import { useAuth } from '@clerk/nextjs';
+import Link from 'next/link';
 
 const PostsList: FC<Props> = ({ posts, isLoading }) => {
     const auth = useAuth();
@@ -26,17 +27,24 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
                     key={post.id}
                     className='flex break-words border-b-[1px] border-solid border-gray-200 p-4 transition-colors duration-200 hover:bg-gray-100'
                 >
-                    <div className='flex w-full items-center'>
-                        <Image
-                            src={post.author.avatar}
-                            alt='Default user image'
-                            width={48}
-                            height={48}
-                            className='mr-3 h-12 w-12 rounded-full object-cover object-center'
-                        />
+                    <div className='flex w-full'>
+                        <Link href={`/${post.author.username}`}>
+                            <Image
+                                src={post.author.avatar}
+                                alt='Default user image'
+                                width={48}
+                                height={48}
+                                className='mr-3 h-12 w-12 rounded-full object-cover object-center'
+                            />
+                        </Link>
 
                         <div className='w-[512px] min-w-0'>
-                            <p className='break-words text-lg font-semibold'>{post.author?.username}</p>
+                            <Link
+                                href={`/${post.author.username}`}
+                                className='break-words text-lg font-semibold hover:underline'
+                            >
+                                {post.author?.username}
+                            </Link>
                             <p className='whitespace-pre-line break-words'>{post.content}</p>
                         </div>
                     </div>

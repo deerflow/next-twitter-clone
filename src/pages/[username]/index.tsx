@@ -11,7 +11,7 @@ import Head from 'next/head';
 import LoadingPage from '~/components/LoadingPage';
 import { useMemo, useState } from 'react';
 import PostsList from '~/components/PostsList';
-import Page404 from './404';
+import Page404 from '../404';
 import EditProfileModal from '~/components/EditProfileModal';
 
 /*export const getServerSideProps: GetServerSideProps = async context => {

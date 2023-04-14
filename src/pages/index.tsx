@@ -9,6 +9,7 @@ import Layout from '~/components/Layout';
 import PostsList from '~/components/PostsList';
 import LoadingPage from '~/components/LoadingPage';
 import Spinner from '~/components/Spinner';
+import Link from 'next/link';
 
 /*export const getServerSideProps: GetServerSideProps = async context => {
     const ssg = createServerSideHelpers({
@@ -69,13 +70,15 @@ const Home: NextPage = () => {
                                 );
                             }}
                         >
-                            <Image
-                                src={getCurrentUser.data?.avatar as string}
-                                alt='Default user image'
-                                width={48}
-                                height={48}
-                                className='mr-3 h-12 w-12 rounded-full'
-                            />
+                            <Link href={`/${getCurrentUser.data?.username as string}`}>
+                                <Image
+                                    src={getCurrentUser.data?.avatar as string}
+                                    alt='Default user image'
+                                    width={48}
+                                    height={48}
+                                    className='mr-3 h-12 w-12 rounded-full'
+                                />
+                            </Link>
                             <TextAreaAutoSize
                                 value={content}
                                 onChange={e => setContent(e.currentTarget.value)}

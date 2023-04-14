@@ -7,11 +7,7 @@ const Layout: FCChildren<Props> = ({ children, left, right }) => {
         <div className='flex min-h-screen'>
             {left || <NavBar />}
             <main className='w-[600px]'>{children}</main>
-            {right || (
-                <div className='flex-1'>
-                    <input placeholder='Search Twitty' />
-                </div>
-            )}
+            {right || <div className='flex-1' />}
         </div>
     );
 };
