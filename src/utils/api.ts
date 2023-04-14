@@ -6,8 +6,7 @@
  */
 import { httpBatchLink, loggerLink } from '@trpc/client';
 import { createTRPCNext } from '@trpc/next';
-import { type TRPCError, type inferRouterInputs, type inferRouterOutputs } from '@trpc/server';
-import { toast } from 'react-hot-toast';
+import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server';
 import superjson from 'superjson';
 
 import { type AppRouter } from '~/server/api/root';
@@ -48,13 +47,6 @@ export const api = createTRPCNext<AppRouter>({
                 defaultOptions: {
                     queries: {
                         retry: false,
-                        onError: toastError,
-                    },
-                    mutations: {
-                        onError: e => {
-                            console.log('mutation error', e);
-                            toastError(e);
-                        },
                     },
                 },
             },
@@ -67,14 +59,6 @@ export const api = createTRPCNext<AppRouter>({
      */
     ssr: false,
 });
-
-const toastError = (e: unknown) => {
-    if (typeof (e as TRPCError)?.message === 'string') {
-        return toast.error((e as TRPCError).message);
-    }
-    toast.error('An error occurred while fetching data.');
-    console.log('error', e);
-};
 
 /**
  * Inference helper for inputs.

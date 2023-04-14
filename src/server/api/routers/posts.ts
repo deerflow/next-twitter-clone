@@ -50,13 +50,14 @@ const posts = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             const { success } = await ratelimit.limit(ctx.auth.userId);
             if (!success)
-                throw new TRPCError({ message: 'You can only do a post every 20 seconds', code: 'TOO_MANY_REQUESTS' });
+                throw new TRPCError({ message: 'You can only make a twitt every 20 seconds', code: 'TOO_MANY_REQUESTS' });
             return ctx.prisma.post.create({ data: { content: input.content, author: ctx.auth.userId } });
         }),
     delete: privateProcedure.input(z.object({ postId: z.string() })).mutation(async ({ ctx, input }) => {
         const post = await ctx.prisma.post.findUnique({ where: { id: input.postId } });
         if (!post) throw new TRPCError({ message: 'Post not found', code: 'NOT_FOUND' });
-        if (post.author !== ctx.auth.userId) throw new TRPCError({ message: 'Unauthorized', code: 'UNAUTHORIZED' });
+        if (post.author !== ctx.auth.userId)
+            throw new TRPCError({ message: "You're not allowed to delete this twitt", code: 'UNAUTHORIZED' });
         return ctx.prisma.post.delete({ where: { id: input.postId } });
     }),
 });

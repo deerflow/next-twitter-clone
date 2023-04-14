@@ -53,8 +53,6 @@ const Post: NextPage = () => {
         return <LoadingPage />;
     }
 
-    console.log('pageHead', PageHead);
-
     return (
         <>
             <Layout>
