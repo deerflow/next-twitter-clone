@@ -11,6 +11,7 @@ import Head from 'next/head';
 import LoadingPage from '~/components/LoadingPage';
 import { useMemo, useState } from 'react';
 import PostsList from '~/components/PostsList';
+import Page404 from './404';
 
 /*export const getServerSideProps: GetServerSideProps = async context => {
     const ssg = createServerSideHelpers({
@@ -40,7 +41,7 @@ const ProfilePage: NextPage = () => {
     const router = useRouter();
     const username = router.query.username as string;
     const getUser = api.users.get.useQuery({ username }, { enabled: router.isReady });
-    const getUserPosts = api.posts.getUserPosts.useQuery({ username });
+    const getUserPosts = api.posts.getUserPosts.useQuery({ username }, { enabled: router.isReady });
 
     const [isEditing, setIsEditing] = useState(false);
 
@@ -54,6 +55,10 @@ const ProfilePage: NextPage = () => {
         ),
         [router.query.username]
     );
+
+    if (getUser.isError && getUser.error.data?.httpStatus === 404) {
+        return <Page404 />;
+    }
 
     if (!auth.isLoaded || getUser.isLoading || getCurrentUser.isLoading) {
         return <LoadingPage>{PageHead}</LoadingPage>;
