@@ -81,6 +81,9 @@ const Home: NextPage = () => {
                                 onChange={e => setContent(e.currentTarget.value)}
                                 placeholder="What's happening?"
                                 className='mt-2.5 w-[424px] resize-none text-xl placeholder-gray-600 outline-none'
+                                minLength={1}
+                                maxLength={280}
+                                required
                             />
                             <div className='ml-3'>
                                 <button

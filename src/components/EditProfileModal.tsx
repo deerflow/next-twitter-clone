@@ -40,6 +40,7 @@ const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
     const handleSubmit = useCallback(
         async (e: FormEvent<HTMLFormElement>) => {
             e.preventDefault();
+            if (username === user?.username && avatar === user?.avatar) return setIsEditing(false);
             const promises: (Promise<UserResource | ImageResource | boolean | void> | undefined)[] = [];
             if (avatar && avatar !== user?.avatar) {
                 const res = await fetch(avatar);
@@ -119,6 +120,9 @@ const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
                         label='Username'
                         value={username as string}
                         onChange={e => setUsername(e.currentTarget.value)}
+                        maxChar={15}
+                        minLength={3}
+                        required
                     />
                 </div>
             </form>
