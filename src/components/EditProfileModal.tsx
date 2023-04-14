@@ -57,7 +57,7 @@ const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
             onClick={() => setIsEditing(false)}
         >
             <form
-                onSubmit={handleSubmit}
+                onSubmit={e => void handleSubmit(e)}
                 onClick={e => e.stopPropagation()}
                 className='w-[585px] rounded-xl bg-white px-4 py-2.5'
             >
@@ -75,7 +75,7 @@ const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
                 <label htmlFor='avatar-upload' className='mt-6 block w-fit cursor-pointer rounded-full'>
                     <Image
                         className='h-[100px] w-[100px] rounded-full object-cover object-center'
-                        src={avatar}
+                        src={avatar as string}
                         alt='Profile picture'
                         width={100}
                         height={100}
@@ -89,10 +89,14 @@ const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
                     />
                 </label>
                 <div className='mt-6'>
-                    <InputText label='Email' value={email} onChange={e => setEmail(e.currentTarget.value)} />
+                    <InputText label='Email' value={email as string} onChange={e => setEmail(e.currentTarget.value)} />
                 </div>
                 <div className='mb-2 mt-6'>
-                    <InputText label='Username' value={username} onChange={e => setUsername(e.currentTarget.value)} />
+                    <InputText
+                        label='Username'
+                        value={username as string}
+                        onChange={e => setUsername(e.currentTarget.value)}
+                    />
                 </div>
             </form>
         </div>
