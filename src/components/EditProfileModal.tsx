@@ -15,18 +15,21 @@ import { type RouterOutput } from '~/server/api/root';
 import Image from 'next/image';
 import { fileToBase64 } from 'deerflow-utils';
 import { useClerk } from '@clerk/nextjs';
+import { useRouter } from 'next/router';
+import { type UserResource, type ImageResource } from '@clerk/types';
+import { api } from '~/utils/api';
 
 const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
+    const context = api.useContext();
+    const router = useRouter();
     const clerk = useClerk();
     const [avatar, setAvatar] = useState<string | null>(user?.avatar || null);
-    const [email, setEmail] = useState<string | null>(user?.email || null);
     const [username, setUsername] = useState<string | null>(user?.username || null);
 
     useEffect(() => {
-        if (user?.email && email === null) setEmail(user.email);
         if (user?.username && username === null) setUsername(user.username);
         if (user?.avatar && avatar === null) setAvatar(user.avatar);
-    }, [user?.email, email, user?.username, user?.avatar, username, avatar]);
+    }, [user?.username, user?.avatar, username, avatar]);
 
     const handleAvatarUpload = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
         if (!e.currentTarget?.files?.[0]) return;
@@ -37,13 +40,36 @@ const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
     const handleSubmit = useCallback(
         async (e: FormEvent<HTMLFormElement>) => {
             e.preventDefault();
+            const promises: (Promise<UserResource | ImageResource | boolean | void> | undefined)[] = [];
             if (avatar && avatar !== user?.avatar) {
                 const res = await fetch(avatar);
                 const blob = await res.blob();
-                await clerk.user?.setProfileImage({ file: blob });
+                promises.push(clerk.user?.setProfileImage({ file: blob }));
             }
+            if (username && username !== user?.username) {
+                await clerk.user?.update({ username });
+                promises.push(router.push(`/${username}`));
+            }
+            if (promises.length > 0) await Promise.all(promises);
+            await Promise.all([
+                context.users.getCurrent.invalidate(),
+                context.users.get.invalidate({ username: user?.username }),
+                context.posts.getUserPosts.invalidate({ username: user?.username }),
+            ]);
+            setIsEditing(false);
         },
-        [avatar, user, clerk]
+        [
+            avatar,
+            user?.avatar,
+            user?.username,
+            username,
+            context.users.getCurrent,
+            context.users.get,
+            context.posts.getUserPosts,
+            setIsEditing,
+            clerk.user,
+            router,
+        ]
     );
 
     if (!user) {
@@ -63,7 +89,7 @@ const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
             >
                 <div className='flex justify-between'>
                     <div className='flex items-center'>
-                        <button>
+                        <button onClick={() => setIsEditing(false)}>
                             <AiOutlineClose className='h-5 w-5' />
                         </button>
                         <h2 className='pl-8 text-xl font-semibold'>Edit profile</h2>
@@ -88,9 +114,6 @@ const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
                         accept='.jpg,.jpeg,.png'
                     />
                 </label>
-                <div className='mt-6'>
-                    <InputText label='Email' value={email as string} onChange={e => setEmail(e.currentTarget.value)} />
-                </div>
                 <div className='mb-2 mt-6'>
                     <InputText
                         label='Username'

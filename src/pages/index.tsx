@@ -74,7 +74,7 @@ const Home: NextPage = () => {
                                 alt='Default user image'
                                 width={48}
                                 height={48}
-                                className='mr-3 h-12 rounded-full'
+                                className='mr-3 h-12 w-12 rounded-full'
                             />
                             <TextAreaAutoSize
                                 value={content}
