@@ -5,7 +5,7 @@ import LoadingPage from '~/components/LoadingPage';
 import { api } from '~/utils/api';
 import Page404 from '../404';
 import Link from 'next/link';
-import { AiOutlineDelete } from 'react-icons/ai';
+import { AiOutlineArrowLeft, AiOutlineDelete } from 'react-icons/ai';
 import Spinner from '~/components/Spinner';
 import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
@@ -34,50 +34,58 @@ const Post: NextPage = () => {
 
     return (
         <Layout>
-            <div className='flex break-words border-x-[1px] border-b-[1px] border-solid border-gray-200 p-4 transition-colors duration-200'>
-                <div className='flex w-full'>
-                    <Link href={`/${getPost.data.author.username}`}>
-                        <Image
-                            src={getPost.data.author.avatar}
-                            alt='Default user image'
-                            width={48}
-                            height={48}
-                            className='mr-3 h-12 w-12 rounded-full object-cover object-center'
-                        />
+            <div className='flex-col break-words border-x-[1px] border-b-[1px] border-solid border-gray-200 p-4'>
+                <div className='mb-4 flex items-center'>
+                    <Link href='/' className='rounded-full p-2 transition-colors duration-200 hover:bg-gray-200'>
+                        <AiOutlineArrowLeft />
                     </Link>
-
-                    <div className='w-[512px] min-w-0'>
-                        <Link
-                            href={`/${getPost.data.author.username}`}
-                            className='break-words text-lg font-semibold hover:underline'
-                        >
-                            {getPost.data.author?.username}
-                        </Link>
-                        <p className='whitespace-pre-line break-words'>{getPost.data.content}</p>
-                    </div>
+                    <h1 className='ml-6 text-xl font-bold'>Twitt</h1>
                 </div>
-                {auth && auth.userId === getPost.data.author.id && (
-                    <button>
-                        {!deletePost.isLoading ? (
-                            <AiOutlineDelete
-                                className='h-5 w-5'
-                                onClick={() => {
-                                    void deletePost.mutate(
-                                        { postId: getPost.data.id },
-                                        {
-                                            onSuccess: () => {
-                                                void context.posts.getAll.invalidate();
-                                                void router.push('/');
-                                            },
-                                        }
-                                    );
-                                }}
+                <div className='flex items-center'>
+                    <div className='flex w-full'>
+                        <Link href={`/${getPost.data.author.username}`}>
+                            <Image
+                                src={getPost.data.author.avatar}
+                                alt='Default user image'
+                                width={48}
+                                height={48}
+                                className='mr-3 h-12 w-12 rounded-full object-cover object-center'
                             />
-                        ) : (
-                            <Spinner size={5} />
-                        )}
-                    </button>
-                )}
+                        </Link>
+
+                        <div className='w-[512px] min-w-0'>
+                            <Link
+                                href={`/${getPost.data.author.username}`}
+                                className='break-words text-lg font-semibold hover:underline'
+                            >
+                                {getPost.data.author?.username}
+                            </Link>
+                            <p className='whitespace-pre-line break-words'>{getPost.data.content}</p>
+                        </div>
+                    </div>
+                    {auth && auth.userId === getPost.data.author.id && (
+                        <button>
+                            {!deletePost.isLoading ? (
+                                <AiOutlineDelete
+                                    className='h-5 w-5'
+                                    onClick={() => {
+                                        void deletePost.mutate(
+                                            { postId: getPost.data.id },
+                                            {
+                                                onSuccess: () => {
+                                                    void context.posts.getAll.invalidate();
+                                                    void router.push('/');
+                                                },
+                                            }
+                                        );
+                                    }}
+                                />
+                            ) : (
+                                <Spinner size={5} />
+                            )}
+                        </button>
+                    )}
+                </div>
             </div>
         </Layout>
     );

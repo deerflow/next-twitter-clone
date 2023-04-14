@@ -7,8 +7,10 @@ import { AiOutlineDelete } from 'react-icons/ai';
 import { api } from '~/utils/api';
 import { useAuth } from '@clerk/nextjs';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 const PostsList: FC<Props> = ({ posts, isLoading }) => {
+    const router = useRouter();
     const auth = useAuth();
     const context = api.useContext();
     const user = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
@@ -24,10 +26,10 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
     return posts && posts.length > 0 ? (
         <div>
             {posts.map(post => (
-                <Link
-                    href={`/${post.author.username}/${post.id}`}
+                <div
+                    onClick={() => void router.push(`/${post.author.username}/${post.id}`)}
                     key={post.id}
-                    className='flex break-words border-b-[1px] border-solid border-gray-200 p-4 transition-colors duration-200 hover:bg-gray-100'
+                    className='flex cursor-pointer break-words border-b-[1px] border-solid border-gray-200 p-4 transition-colors duration-200 hover:bg-gray-100'
                 >
                     <div className='flex w-full'>
                         <Link href={`/${post.author.username}`}>
@@ -55,7 +57,8 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
                             {!deletePost.isLoading ? (
                                 <AiOutlineDelete
                                     className='h-5 w-5'
-                                    onClick={() =>
+                                    onClick={e => {
+                                        e.stopPropagation();
                                         void deletePost.mutate(
                                             { postId: post.id },
                                             {
@@ -66,15 +69,15 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
                                                     });
                                                 },
                                             }
-                                        )
-                                    }
+                                        );
+                                    }}
                                 />
                             ) : (
                                 <Spinner size={5} />
                             )}
                         </button>
                     )}
-                </Link>
+                </div>
             ))}
         </div>
     ) : (
