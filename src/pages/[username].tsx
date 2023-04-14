@@ -44,6 +44,8 @@ const ProfilePage: NextPage = () => {
     const getUser = api.users.get.useQuery({ username }, { enabled: router.isReady });
     const getUserPosts = api.posts.getUserPosts.useQuery({ username }, { enabled: router.isReady });
 
+    const postsNumber = useMemo(() => getUserPosts.data?.length || 0, [getUserPosts.data?.length]);
+
     const [isEditing, setIsEditing] = useState(false);
 
     const PageHead = useMemo(
@@ -78,7 +80,9 @@ const ProfilePage: NextPage = () => {
                     </Link>
                     <div className='flex flex-col justify-evenly'>
                         <h1 className='text-xl font-semibold'>{getUser.data?.username}</h1>
-                        <p className='text-sm text-gray-600'>0 twitts</p>
+                        <p className='text-sm text-gray-600'>
+                            {postsNumber > 1 ? `${postsNumber} twitts` : `${postsNumber} twitt`}
+                        </p>
                     </div>
                 </div>
                 <div className='border-[1px] border-t-0 border-solid border-gray-200'>

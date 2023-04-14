@@ -49,7 +49,12 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
                                         void deletePost.mutate(
                                             { postId: post.id },
                                             {
-                                                onSuccess: () => void context.posts.getAll.invalidate(),
+                                                onSuccess: () => {
+                                                    void context.posts.getAll.invalidate();
+                                                    void context.posts.getUserPosts.invalidate({
+                                                        username: user.data?.username,
+                                                    });
+                                                },
                                             }
                                         )
                                     }
