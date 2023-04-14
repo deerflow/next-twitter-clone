@@ -40,17 +40,21 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
                     </div>
                     {user && user.data?.id === post.author.id && (
                         <button>
-                            <AiOutlineDelete
-                                className='h-5 w-5'
-                                onClick={() =>
-                                    void deletePost.mutate(
-                                        { postId: post.id },
-                                        {
-                                            onSuccess: () => void context.posts.getAll.invalidate(),
-                                        }
-                                    )
-                                }
-                            />
+                            {!deletePost.isLoading ? (
+                                <AiOutlineDelete
+                                    className='h-5 w-5'
+                                    onClick={() =>
+                                        void deletePost.mutate(
+                                            { postId: post.id },
+                                            {
+                                                onSuccess: () => void context.posts.getAll.invalidate(),
+                                            }
+                                        )
+                                    }
+                                />
+                            ) : (
+                                <Spinner size={5} />
+                            )}
                         </button>
                     )}
                 </div>

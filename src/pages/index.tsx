@@ -1,6 +1,6 @@
 import { type NextPage } from 'next';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { api } from '~/utils/api';
 import TextAreaAutoSize from 'react-textarea-autosize';
 import Image from 'next/image';
@@ -8,6 +8,7 @@ import { useAuth } from '@clerk/nextjs';
 import Layout from '~/components/Layout';
 import PostsList from '~/components/PostsList';
 import LoadingPage from '~/components/LoadingPage';
+import Spinner from '~/components/Spinner';
 
 /*export const getServerSideProps: GetServerSideProps = async context => {
     const ssg = createServerSideHelpers({
@@ -39,11 +40,6 @@ const Home: NextPage = () => {
     const createPost = api.posts.create.useMutation();
 
     const [content, setContent] = useState('');
-    const [isTweetButtonDisabled, setIsTweetButtonDisabled] = useState(true);
-
-    useEffect(() => {
-        setIsTweetButtonDisabled(content.length === 0);
-    }, [content.length]);
 
     if (!auth.isLoaded || getCurrentUser.isLoading)
         return (
@@ -74,7 +70,7 @@ const Home: NextPage = () => {
                             }}
                         >
                             <Image
-                                src={getCurrentUser.data?.avatar}
+                                src={getCurrentUser.data?.avatar as string}
                                 alt='Default user image'
                                 width={48}
                                 height={48}
@@ -88,10 +84,11 @@ const Home: NextPage = () => {
                             />
                             <div className='ml-3'>
                                 <button
-                                    className='rounded-full bg-blue-500 px-4 py-2 font-medium text-white disabled:bg-blue-200'
+                                    className='flex items-center rounded-full bg-blue-500 px-4 py-2 font-medium text-white disabled:bg-blue-200'
                                     type='submit'
-                                    disabled={isTweetButtonDisabled}
+                                    disabled={content.length === 0 || createPost.isLoading}
                                 >
+                                    {createPost.isLoading && <Spinner size={4} className='mr-2' />}
                                     Tweet
                                 </button>
                             </div>

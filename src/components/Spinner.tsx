@@ -1,11 +1,13 @@
-import { type FC } from 'react';
+import { type HTMLAttributes, type FC } from 'react';
 
-const Spinner: FC<Props> = ({}) => {
+const Spinner: FC<Props> = ({ size, ...props }) => {
     return (
-        <div role='status'>
+        <div role='status' {...props}>
             <svg
                 aria-hidden='true'
-                className='mr-2 h-8 w-8 animate-spin fill-blue-600 text-gray-200 dark:text-gray-600'
+                className={`h-${size ? size : '8'} w-${
+                    size ? size : '8'
+                } animate-spin fill-blue-600 text-gray-200 dark:text-gray-600`}
                 viewBox='0 0 100 101'
                 fill='none'
                 xmlns='http://www.w3.org/2000/svg'
@@ -24,6 +26,8 @@ const Spinner: FC<Props> = ({}) => {
     );
 };
 
-interface Props {}
+interface Props extends HTMLAttributes<HTMLDivElement> {
+    size?: number;
+}
 
 export default Spinner;

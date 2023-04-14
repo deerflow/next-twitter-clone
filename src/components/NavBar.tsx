@@ -13,7 +13,7 @@ const NavBar: FC = () => {
     const router = useRouter();
 
     return (
-        <nav className='box-border flex h-screen flex-1 justify-center pt-6 text-xl'>
+        <nav className='sticky top-0 box-border flex h-screen flex-1 justify-center pt-6 text-xl'>
             <div className='flex w-fit flex-col items-center justify-between'>
                 <ul className='w-full'>
                     <li>
