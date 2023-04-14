@@ -14,28 +14,6 @@ import PostsList from '~/components/PostsList';
 import Page404 from '../404';
 import EditProfileModal from '~/components/EditProfileModal';
 
-/*export const getServerSideProps: GetServerSideProps = async context => {
-    const ssg = createServerSideHelpers({
-        router: appRouter,
-        ctx: { prisma, auth: getAuth(context.req), ip: context.req.headers['x-forwarded-for'] },
-        transformer: superjson,
-    });
-
-    const username = context.params?.username;
-
-    if (typeof username !== 'string') {
-        throw new Error('Invalid username');
-    }
-
-    await Promise.all([ssg.users.get.prefetch({ username }), ssg.users.getCurrent.prefetch()]);
-
-    return {
-        props: {
-            trpcState: ssg.dehydrate(),
-        },
-    };
-};*/
-
 const ProfilePage: NextPage = () => {
     const auth = useAuth();
     const getCurrentUser = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });

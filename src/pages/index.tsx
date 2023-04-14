@@ -11,19 +11,6 @@ import LoadingPage from '~/components/LoadingPage';
 import Spinner from '~/components/Spinner';
 import Link from 'next/link';
 
-/*export const getServerSideProps: GetServerSideProps = async context => {
-    const ssg = createServerSideHelpers({
-        router: appRouter,
-        ctx: { prisma, auth: getAuth(context.req), ip: context.req.headers['x-forwarded-for'] },
-        transformer: SuperJSON,
-    });
-
-    await ssg.users.getCurrent.prefetch();
-    await ssg.posts.getAll.prefetch();
-
-    return { props: { trpcState: ssg.dehydrate() } };
-};*/
-
 const PageHead = () => (
     <Head>
         <title>Twitty</title>
