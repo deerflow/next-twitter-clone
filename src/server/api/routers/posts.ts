@@ -35,6 +35,12 @@ const posts = createTRPCRouter({
         const posts = await ctx.prisma.post.findMany({ where: { author: user.id }, orderBy: { createdAt: 'desc' } });
         return posts.map(post => ({ ...post, author: user }));
     }),
+    delete: privateProcedure.input(z.object({ postId: z.string() })).mutation(async ({ ctx, input }) => {
+        const post = await ctx.prisma.post.findUnique({ where: { id: input.postId } });
+        if (!post) throw new TRPCError({ message: 'Post not found', code: 'NOT_FOUND' });
+        if (post.author !== ctx.auth.userId) throw new TRPCError({ message: 'Unauthorized', code: 'UNAUTHORIZED' });
+        return ctx.prisma.post.delete({ where: { id: input.postId } });
+    }),
 });
 
 export default posts;
