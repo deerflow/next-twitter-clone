@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { createTRPCRouter, privateProcedure, publicProcedure } from '~/server/api/trpc';
 import users from './users';
 import { TRPCError } from '@trpc/server';
+import ratelimit from '~/server/rateLimit';
 
 const posts = createTRPCRouter({
     getAll: publicProcedure.query(async ({ ctx }) => {
@@ -47,6 +48,8 @@ const posts = createTRPCRouter({
     create: privateProcedure
         .input(z.object({ content: z.string().min(1).max(280) }))
         .mutation(async ({ ctx, input }) => {
+            const { success } = await ratelimit.limit(ctx.auth.userId);
+            if (!success) throw new TRPCError({ message: 'Too many requests', code: 'TOO_MANY_REQUESTS' });
             return ctx.prisma.post.create({ data: { content: input.content, author: ctx.auth.userId } });
         }),
     delete: privateProcedure.input(z.object({ postId: z.string() })).mutation(async ({ ctx, input }) => {
