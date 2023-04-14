@@ -28,6 +28,7 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import superjson from 'superjson';
 import { ZodError } from 'zod';
 import { getAuth } from '@clerk/nextjs/server';
+import redisClient from '../redis';
 
 /**
  * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
@@ -40,7 +41,7 @@ import { getAuth } from '@clerk/nextjs/server';
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
 export const createTRPCContext = (opts: CreateNextContextOptions) => {
-    return { prisma, auth: getAuth(opts.req), ip: opts.req.headers['x-forwarded-for'] };
+    return { prisma, auth: getAuth(opts.req), ip: opts.req.headers['x-forwarded-for'], redis: redisClient };
 };
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
@@ -80,6 +81,7 @@ export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 
 export const isLoggedInMiddleware = t.middleware(async ({ ctx, next }) => {
+    void redisClient.disconnect();
     const { auth, prisma } = ctx;
 
     if (!auth.userId) {
@@ -90,6 +92,7 @@ export const isLoggedInMiddleware = t.middleware(async ({ ctx, next }) => {
         ctx: {
             auth,
             prisma,
+            redisClient,
         },
     });
 });

@@ -1,7 +1,7 @@
-import redisClient from '../redis';
+import { type RedisClientType } from '@redis/client';
 import { TRPCError } from '@trpc/server';
 
-const rateLimit = async ({ ip, key, tokens, delayMs }: RateLimitOptions) => {
+const rateLimit = async ({ ip, key, tokens, delayMs, redisClient }: RateLimitOptions) => {
     await redisClient.connect();
     try {
         if (typeof ip !== 'string') {
@@ -39,6 +39,7 @@ interface RateLimitOptions {
     key: string;
     tokens: number;
     delayMs: number;
+    redisClient: RedisClientType;
 }
 
 export default rateLimit;
