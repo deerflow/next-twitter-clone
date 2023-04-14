@@ -18,6 +18,7 @@ import { useClerk } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 import { type UserResource, type ImageResource } from '@clerk/types';
 import { api } from '~/utils/api';
+import toast from 'react-hot-toast';
 
 const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
     const context = api.useContext();
@@ -48,10 +49,20 @@ const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
                 promises.push(clerk.user?.setProfileImage({ file: blob }));
             }
             if (username && username !== user?.username) {
-                await clerk.user?.update({ username });
-                promises.push(router.push(`/${username}`));
+                try {
+                    await clerk.user?.update({ username });
+                    promises.push(router.push(`/${username}`));
+                } catch (e) {
+                    return toast.error('Invalid username or already taken');
+                }
             }
-            if (promises.length > 0) await Promise.all(promises);
+            if (promises.length > 0) {
+                try {
+                    await Promise.all(promises);
+                } catch (e) {
+                    return toast.error('Something went wrong while updating your profile');
+                }
+            }
             await Promise.all([
                 context.users.getCurrent.invalidate(),
                 context.users.get.invalidate({ username: user?.username }),

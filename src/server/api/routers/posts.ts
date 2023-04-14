@@ -49,7 +49,8 @@ const posts = createTRPCRouter({
         .input(z.object({ content: z.string().min(1).max(280) }))
         .mutation(async ({ ctx, input }) => {
             const { success } = await ratelimit.limit(ctx.auth.userId);
-            if (!success) throw new TRPCError({ message: 'Too many requests', code: 'TOO_MANY_REQUESTS' });
+            if (!success)
+                throw new TRPCError({ message: 'You can only do a post every 20 seconds', code: 'TOO_MANY_REQUESTS' });
             return ctx.prisma.post.create({ data: { content: input.content, author: ctx.auth.userId } });
         }),
     delete: privateProcedure.input(z.object({ postId: z.string() })).mutation(async ({ ctx, input }) => {

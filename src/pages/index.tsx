@@ -10,6 +10,7 @@ import PostsList from '~/components/PostsList';
 import LoadingPage from '~/components/LoadingPage';
 import Spinner from '~/components/Spinner';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 const PageHead = () => (
     <Head>
@@ -53,6 +54,7 @@ const Home: NextPage = () => {
                                             setContent('');
                                             void context.posts.getAll.invalidate();
                                         },
+                                        onError: e => toast.error(e.message),
                                     }
                                 );
                             }}
