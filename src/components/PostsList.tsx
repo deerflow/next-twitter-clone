@@ -5,10 +5,12 @@ import Spinner from './Spinner';
 import { type RouterOutput } from '~/server/api/root';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { api } from '~/utils/api';
+import { useAuth } from '@clerk/nextjs';
 
 const PostsList: FC<Props> = ({ posts, isLoading }) => {
+    const auth = useAuth();
     const context = api.useContext();
-    const user = api.users.getCurrent.useQuery();
+    const user = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const deletePost = api.posts.delete.useMutation();
 
     if (isLoading)
