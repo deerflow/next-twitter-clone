@@ -10,20 +10,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-    id              String   @id @default(cuid())
-    createdAt       DateTime @default(now())
-    email           String   @unique
-    username        String   @unique
-    profilePicture  String?
-}
-
 model Post {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     author    String   
     content   String   @db.VarChar(280)
-    image     Image?   
+    image     Image?
+    comments  Comment[]
 }
 
 model Image {
@@ -35,4 +28,13 @@ model Image {
     url             String
     fileId          String
     blurDataUrl     String
+}
+
+model Comment {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    authorId  String
+    content   String   @db.VarChar(280)
+    post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+    postId    String
 }

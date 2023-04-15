@@ -2,6 +2,7 @@ import { prisma } from '~/server/db';
 import { createTRPCRouter } from '~/server/api/trpc';
 import users from './routers/users';
 import posts from './routers/posts';
+import comments from './routers/comments';
 import { type GetServerSidePropsContext } from 'next';
 import { getAuth } from '@clerk/nextjs/server';
 import superjson from 'superjson';
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
     users,
     posts,
     images,
+    comments,
 });
 
 export const getSSG = (context: GetServerSidePropsContext) =>

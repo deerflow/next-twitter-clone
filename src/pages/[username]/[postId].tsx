@@ -13,6 +13,8 @@ import Head from 'next/head';
 import TextAreaAutoSize from 'react-textarea-autosize';
 import NextImage from 'next/image';
 import { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import CommentsList from '~/components/CommentsList';
 
 const Post: NextPage = () => {
     const auth = useAuth();
@@ -21,11 +23,14 @@ const Post: NextPage = () => {
     const [username, postId] = [router.query.username, router.query.postId] as [string, string];
     const [replyContent, setReplyContent] = useState('');
 
-    const getPost = api.posts.getOne.useQuery({ postId });
-    const deletePost = api.posts.delete.useMutation();
+    const getPost = api.posts.getOne.useQuery({ postId }, { enabled: !!postId });
     const getCurrentUser = api.users.getCurrent.useQuery();
+    const getComments = api.comments.getAllForPost.useQuery({ postId }, { enabled: !!postId });
+    const deletePost = api.posts.delete.useMutation();
 
-    if (getPost.isLoading || !auth.isLoaded) {
+    const createComment = api.comments.create.useMutation();
+
+    if (getPost.isLoading || !auth.isLoaded || !username || !postId) {
         return <LoadingPage />;
     }
 
@@ -119,7 +124,21 @@ const Post: NextPage = () => {
                     )}
                 </div>
                 {auth.isSignedIn && (
-                    <form className='border-x-[1px] border-b-[1px] border-solid border-gray-200 p-4'>
+                    <form
+                        className='border-x-[1px] border-b-[1px] border-solid border-gray-200 p-4'
+                        onSubmit={e => {
+                            e.preventDefault();
+                            createComment.mutate(
+                                { content: replyContent, postId: getPost.data.id },
+                                {
+                                    onSuccess: () => {
+                                        setReplyContent('');
+                                    },
+                                    onError: _ => toast.error('Something went wrong'),
+                                }
+                            );
+                        }}
+                    >
                         <div className='flex justify-between'>
                             <Link href={`/${getCurrentUser.data?.username as string}`}>
                                 <NextImage
@@ -151,6 +170,17 @@ const Post: NextPage = () => {
                         </div>
                     </form>
                 )}
+
+                <div className='border-x-[1px] border-b-[1px] border-solid border-gray-200'>
+                    <h2 className='border-b-[1px] border-solid border-gray-200 p-4 text-lg font-medium'>
+                        Replies to{' '}
+                        <Link className='text-blue-500' href={`/${getPost.data.author.username}`}>
+                            @{getPost.data.author.username}
+                        </Link>{' '}
+                        :
+                    </h2>
+                    <CommentsList comments={getComments.data} />
+                </div>
             </Layout>
         </>
     );
