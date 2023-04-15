@@ -33,7 +33,12 @@ const CommentsList: FC<Props> = ({ comments, isLoading, postId }) => {
         },
     });
 
-    if (!comments) return null;
+    if (isLoading)
+        return (
+            <div className='mt-5 flex justify-center'>
+                <Spinner />
+            </div>
+        );
 
     return (
         <>

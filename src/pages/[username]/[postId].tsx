@@ -28,7 +28,7 @@ const OnePost: NextPage = () => {
     const createComment = api.comments.create.useMutation({
         onSuccess: () => {
             setReplyContent('');
-            void context.comments.getAllForPost.invalidate({ postId: getPost.data.id });
+            void context.comments.getAllForPost.invalidate({ postId: getPost.data?.id as string });
         },
         onMutate: async ({ content, postId }) => {
             const previousComments = context.comments.getAllForPost.getData({ postId });
@@ -137,7 +137,11 @@ const OnePost: NextPage = () => {
                             </Link>{' '}
                             :
                         </h2>
-                        <CommentsList comments={getComments.data} isLoading={getComments.isLoading} postId={getPost.data.id} />
+                        <CommentsList
+                            comments={getComments.data}
+                            isLoading={getComments.isLoading}
+                            postId={getPost.data.id}
+                        />
                     </div>
                 )}
             </Layout>
