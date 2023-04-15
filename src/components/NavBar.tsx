@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import type { FC } from 'react';
 import Link from 'next/link';
 import { AiOutlineUser, AiOutlineHome, AiOutlineDisconnect } from 'react-icons/ai';
 import logo from '../assets/favicon.svg';
@@ -6,11 +6,10 @@ import Image, { type StaticImageData } from 'next/image';
 import { useRouter } from 'next/router';
 import { api } from '~/utils/api';
 import { useAuth } from '@clerk/nextjs';
-import { undefined } from 'zod';
 
 const NavBar: FC = () => {
     const auth = useAuth();
-    const getCurrentUser = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
+    const getCurrentUser = api.users.getCurrent.useQuery();
     const router = useRouter();
 
     return (
@@ -68,8 +67,8 @@ const NavBar: FC = () => {
                     <div className='mb-5 flex w-64 justify-between p-2'>
                         <div className='flex items-center'>
                             <Image
-                                src={getCurrentUser.data?.avatar}
-                                alt={`${getCurrentUser.data?.username}'s avatar`}
+                                src={getCurrentUser.data?.avatar as string}
+                                alt={`${getCurrentUser.data?.username as string}'s avatar`}
                                 width={48}
                                 height={48}
                                 className='h-12 w-12 rounded-full'
