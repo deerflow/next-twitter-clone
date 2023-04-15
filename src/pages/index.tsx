@@ -65,7 +65,6 @@ const Home: NextPage = () => {
                     {auth.isSignedIn && (
                         <form
                             onSubmit={e => {
-                                console.log('submit');
                                 e.preventDefault();
                                 if (uploadedImage) {
                                     console.log('image');

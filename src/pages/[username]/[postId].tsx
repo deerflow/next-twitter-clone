@@ -10,15 +10,20 @@ import Spinner from '~/components/Spinner';
 import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
 import Head from 'next/head';
+import TextAreaAutoSize from 'react-textarea-autosize';
+import NextImage from 'next/image';
+import { useState } from 'react';
 
 const Post: NextPage = () => {
     const auth = useAuth();
     const router = useRouter();
     const context = api.useContext();
     const [username, postId] = [router.query.username, router.query.postId] as [string, string];
+    const [replyContent, setReplyContent] = useState('');
 
     const getPost = api.posts.getOne.useQuery({ postId });
     const deletePost = api.posts.delete.useMutation();
+    const getCurrentUser = api.users.getCurrent.useQuery();
 
     if (getPost.isLoading || !auth.isLoaded) {
         return <LoadingPage />;
@@ -113,6 +118,39 @@ const Post: NextPage = () => {
                         />
                     )}
                 </div>
+                {auth.isSignedIn && (
+                    <form className='border-x-[1px] border-b-[1px] border-solid border-gray-200 p-4'>
+                        <div className='flex justify-between'>
+                            <Link href={`/${getCurrentUser.data?.username as string}`}>
+                                <NextImage
+                                    src={getCurrentUser.data?.avatar as string}
+                                    alt='Default user image'
+                                    width={48}
+                                    height={48}
+                                    className='mr-3 h-12 w-12 rounded-full'
+                                />
+                            </Link>
+                            <TextAreaAutoSize
+                                value={replyContent}
+                                onChange={e => setReplyContent(e.currentTarget.value)}
+                                placeholder='Tweet you reply'
+                                className='mt-2.5 w-[424px] resize-none text-xl placeholder-gray-600 outline-none'
+                                minLength={1}
+                                maxLength={280}
+                                required
+                            />
+                            <div className='ml-3'>
+                                <button
+                                    className='flex items-center rounded-full bg-blue-500 px-4 py-2 font-medium text-white disabled:bg-blue-200'
+                                    type='submit'
+                                    disabled={replyContent.length === 0}
+                                >
+                                    Reply
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                )}
             </Layout>
         </>
     );
