@@ -176,7 +176,7 @@ const Home: NextPage = () => {
                     )}
 
                     <div className={getPosts.isLoading ? '' : 'border-[1px] border-y-0 border-solid'}>
-                        <PostsList posts={getPosts.data} isLoading={getPosts.isLoading} />
+                        <PostsList posts={getPosts.data} isLoading={getPosts.isLoading} clickable={true} />
                     </div>
                 </div>
             </Layout>

@@ -5,9 +5,6 @@ import LoadingPage from '~/components/LoadingPage';
 import { api } from '~/utils/api';
 import Page404 from '../404';
 import Link from 'next/link';
-import { AiOutlineArrowLeft, AiOutlineDelete } from 'react-icons/ai';
-import Spinner from '~/components/Spinner';
-import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
 import Head from 'next/head';
 import TextAreaAutoSize from 'react-textarea-autosize';
@@ -15,8 +12,9 @@ import NextImage from 'next/image';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import CommentsList from '~/components/CommentsList';
+import Post from '~/components/Post';
 
-const Post: NextPage = () => {
+const OnePost: NextPage = () => {
     const auth = useAuth();
     const router = useRouter();
     const context = api.useContext();
@@ -26,11 +24,10 @@ const Post: NextPage = () => {
     const getPost = api.posts.getOne.useQuery({ postId }, { enabled: !!postId });
     const getCurrentUser = api.users.getCurrent.useQuery();
     const getComments = api.comments.getAllForPost.useQuery({ postId }, { enabled: !!postId });
-    const deletePost = api.posts.delete.useMutation();
 
     const createComment = api.comments.create.useMutation();
 
-    if (getPost.isLoading || !auth.isLoaded || !username || !postId) {
+    if (getPost.isLoading || getComments.isLoading || !auth.isLoaded || !username || !postId) {
         return <LoadingPage />;
     }
 
@@ -59,70 +56,10 @@ const Post: NextPage = () => {
                 <link rel='icon' href='/favicon.svg' />
             </Head>
             <Layout>
-                <div className='flex-col break-words border-x-[1px] border-b-[1px] border-solid border-gray-200 p-4'>
-                    <div className='mb-4 flex items-center'>
-                        <Link href='/' className='rounded-full p-2 transition-colors duration-200 hover:bg-gray-200'>
-                            <AiOutlineArrowLeft />
-                        </Link>
-                        <h1 className='ml-6 text-xl font-bold'>Twitt</h1>
-                    </div>
-                    <div className='mb-4 flex items-center'>
-                        <div className='flex w-full'>
-                            <Link href={`/${getPost.data.author.username}`}>
-                                <Image
-                                    src={getPost.data.author.avatar}
-                                    alt='Default user image'
-                                    width={48}
-                                    height={48}
-                                    className='mr-3 h-12 w-12 rounded-full object-cover object-center'
-                                />
-                            </Link>
-
-                            <div className='w-[512px] min-w-0'>
-                                <Link
-                                    href={`/${getPost.data.author.username}`}
-                                    className='break-words text-lg font-semibold hover:underline'
-                                >
-                                    {getPost.data.author?.username}
-                                </Link>
-                                <p className='whitespace-pre-line break-words'>{getPost.data.content}</p>
-                            </div>
-                        </div>
-                        {auth && auth.userId === getPost.data.author.id && (
-                            <button>
-                                {!deletePost.isLoading ? (
-                                    <AiOutlineDelete
-                                        className='h-5 w-5'
-                                        onClick={() => {
-                                            void deletePost.mutate(
-                                                { postId: getPost.data.id },
-                                                {
-                                                    onSuccess: () => {
-                                                        void context.posts.getAll.invalidate();
-                                                        void router.push('/');
-                                                    },
-                                                }
-                                            );
-                                        }}
-                                    />
-                                ) : (
-                                    <Spinner size={5} />
-                                )}
-                            </button>
-                        )}
-                    </div>
-                    {getPost.data.image && (
-                        <Image
-                            src={getPost.data.image.url}
-                            alt='Upload image'
-                            width={getPost.data.image.width}
-                            height={getPost.data.image.height}
-                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                            blurDataURL={getPost.data.image.blurDataUrl}
-                            placeholder='blur'
-                        />
-                    )}
+                <div className='border-x-[1px] border-solid border-gray-200'>
+                    <Post post={{ ...getPost.data, _count: { comments: getComments.data?.length as number } }} />
                 </div>
+
                 {auth.isSignedIn && (
                     <form
                         className='border-x-[1px] border-b-[1px] border-solid border-gray-200 p-4'
@@ -171,7 +108,6 @@ const Post: NextPage = () => {
                         </div>
                     </form>
                 )}
-
                 {getComments.data && getComments.data.length > 0 && (
                     <div className='border-x-[1px] border-solid border-gray-200'>
                         <h2 className='border-b-[1px] border-solid border-gray-200 p-4 text-lg font-medium'>
@@ -188,4 +124,4 @@ const Post: NextPage = () => {
         </>
     );
 };
-export default Post;
+export default OnePost;

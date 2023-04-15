@@ -86,7 +86,7 @@ const ProfilePage: NextPage = () => {
                     </div>
                 </div>
                 <div className={getUserPosts.isLoading ? '' : 'border-x-[1px] border-solid border-gray-200'}>
-                    <PostsList posts={getUserPosts.data} isLoading={getUserPosts.isLoading} />
+                    <PostsList posts={getUserPosts.data} isLoading={getUserPosts.isLoading} clickable={true} />
                 </div>
             </Layout>
             {isEditing && <EditProfileModal setIsEditing={setIsEditing} user={getCurrentUser.data} />}
