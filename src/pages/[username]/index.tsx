@@ -22,7 +22,7 @@ const ProfilePage: NextPage = () => {
     const getUser = api.users.get.useQuery({ username }, { enabled: router.isReady });
     const getUserPosts = api.posts.getUserPosts.useQuery({ username }, { enabled: router.isReady });
 
-    const postsNumber = useMemo(() => getUserPosts.data?.length || 0, [getUserPosts.data?.length]);
+    const postsNumber = getUserPosts.data?.length || 0;
 
     const [isEditing, setIsEditing] = useState(false);
 

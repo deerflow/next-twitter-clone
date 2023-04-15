@@ -5,9 +5,7 @@ const Spinner: FC<Props> = ({ size, ...props }) => {
         <div role='status' {...props}>
             <svg
                 aria-hidden='true'
-                className={`h-${size ? size : '8'} w-${
-                    size ? size : '8'
-                } animate-spin fill-blue-600 text-gray-200 dark:text-gray-600`}
+                className={`h-${size ? size : '8'} w-${size ? size : '8'} animate-spin fill-blue-600 text-gray-200`}
                 viewBox='0 0 100 101'
                 fill='none'
                 xmlns='http://www.w3.org/2000/svg'

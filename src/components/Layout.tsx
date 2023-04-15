@@ -3,15 +3,20 @@ import NavBar from './NavBar';
 import { type ReactNode } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import LoginBar from './LoginBar.';
+import { useRouter } from 'next/router';
 
 const Layout: FCChildren<Props> = ({ children, left, right }) => {
     const auth = useAuth();
+    const router = useRouter();
     return (
         <div className='flex min-h-screen'>
             {left || <NavBar />}
             <main className='w-[600px]'>{children}</main>
             {right || <div className='flex-1' />}
-            {auth.isLoaded && !auth.isSignedIn && <LoginBar />}
+            {auth.isLoaded &&
+                !auth.isSignedIn &&
+                router.route !== '/users/sign-in' &&
+                router.route !== '/users/sign-up' && <LoginBar />}
         </div>
     );
 };
