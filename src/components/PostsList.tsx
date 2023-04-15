@@ -1,12 +1,14 @@
 import { type FC } from 'react';
 import Spinner from './Spinner';
-import { type RouterOutput } from '~/server/api/root';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { api } from '~/utils/api';
 import { useAuth } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import NextImage from 'next/image';
+import { FaRegComment } from 'react-icons/fa';
+import { type Props } from 'next/script';
+import { type RouterOutput } from '~/server/api/root';
 
 const PostsList: FC<Props> = ({ posts, isLoading }) => {
     const router = useRouter();
@@ -30,7 +32,7 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
                     <div
                         onClick={() => void router.push(`/${post.author.username}/${post.id}`)}
                         key={post.id}
-                        className='flex cursor-pointer flex-col break-words border-b-[1px] border-solid border-gray-200 p-4 transition-colors duration-200 hover:bg-gray-100'
+                        className='flex cursor-pointer flex-col break-words border-b-[1px] border-solid border-gray-200 p-4 pb-2 transition-colors duration-200 hover:bg-gray-100'
                     >
                         <div className='mb-3 flex'>
                             <div className='flex w-full'>
@@ -90,6 +92,16 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
                                 placeholder='blur'
                             />
                         )}
+                        <div className='text-gray-600'>
+                            <div className='group flex w-fit items-center'>
+                                <div className='rounded-full p-2 transition-colors duration-100 group-hover:bg-blue-300/25 group-hover:text-blue-500'>
+                                    <FaRegComment />
+                                </div>
+                                <p className='ml-1 text-sm transition-colors duration-100 group-hover:text-blue-500'>
+                                    {post._count.comments}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 ))}
             </div>

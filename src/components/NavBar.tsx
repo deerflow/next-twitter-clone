@@ -12,7 +12,6 @@ const NavBar: FC = () => {
     const auth = useAuth();
     const getCurrentUser = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const router = useRouter();
-    console.log(router.route);
 
     return (
         <nav className='sticky top-0 box-border flex h-screen flex-1 justify-center pt-6 text-xl'>
@@ -43,11 +42,17 @@ const NavBar: FC = () => {
                             >
                                 <AiOutlineUser
                                     className='mr-4 h-7 w-7'
-                                    strokeWidth={router.query.username === getCurrentUser?.data?.username ? 24 : 4}
+                                    strokeWidth={
+                                        router.query.username === getCurrentUser?.data?.username && !router.query.postId
+                                            ? 24
+                                            : 4
+                                    }
                                 />
                                 <p
                                     className={`${
-                                        router.query.username && router.query.username === getCurrentUser.data?.username
+                                        router.query.username &&
+                                        router.query.username === getCurrentUser.data?.username &&
+                                        !router.query.postId
                                             ? 'font-bold'
                                             : ''
                                     }`}
