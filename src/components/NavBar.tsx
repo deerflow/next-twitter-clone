@@ -6,11 +6,13 @@ import Image, { type StaticImageData } from 'next/image';
 import { useRouter } from 'next/router';
 import { api } from '~/utils/api';
 import { useAuth } from '@clerk/nextjs';
+import { undefined } from 'zod';
 
 const NavBar: FC = () => {
     const auth = useAuth();
     const getCurrentUser = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const router = useRouter();
+    console.log(router.route);
 
     return (
         <nav className='sticky top-0 box-border flex h-screen flex-1 justify-center pt-6 text-xl'>
@@ -29,7 +31,7 @@ const NavBar: FC = () => {
                             href='/'
                             className='my-0.5 flex w-fit items-center rounded-full py-3 pl-4 pr-5 transition-colors duration-200 hover:bg-gray-200'
                         >
-                            <AiOutlineHome className='mr-4 h-7 w-7' />
+                            <AiOutlineHome className='mr-4 h-7 w-7' strokeWidth={router.route === '/' ? 24 : 4} />
                             <p className={`${router.route === '/' ? 'font-bold' : ''}`}>Home</p>
                         </Link>
                     </li>
@@ -39,7 +41,10 @@ const NavBar: FC = () => {
                                 href={`/${getCurrentUser.data?.username || ''}`}
                                 className='my-0.5 flex w-fit items-center rounded-full py-3 pl-4 pr-5 transition-colors duration-200 hover:bg-gray-200'
                             >
-                                <AiOutlineUser className='mr-4 h-7 w-7' />
+                                <AiOutlineUser
+                                    className='mr-4 h-7 w-7'
+                                    strokeWidth={router.query.username === getCurrentUser?.data?.username ? 24 : 4}
+                                />
                                 <p
                                     className={`${
                                         router.query.username && router.query.username === getCurrentUser.data?.username
@@ -58,8 +63,8 @@ const NavBar: FC = () => {
                     <div className='mb-5 flex w-64 justify-between p-2'>
                         <div className='flex items-center'>
                             <Image
-                                src={getCurrentUser.data?.avatar as string}
-                                alt={`${getCurrentUser.data?.username as string}'s avatar`}
+                                src={getCurrentUser.data?.avatar}
+                                alt={`${getCurrentUser.data?.username}'s avatar`}
                                 width={48}
                                 height={48}
                                 className='h-12 w-12 rounded-full'
