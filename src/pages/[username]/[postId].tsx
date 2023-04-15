@@ -22,7 +22,7 @@ const OnePost: NextPage = () => {
     const [replyContent, setReplyContent] = useState('');
 
     const getPost = api.posts.getOne.useQuery({ postId }, { enabled: !!postId });
-    const getCurrentUser = api.users.getCurrent.useQuery();
+    const getCurrentUser = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const getComments = api.comments.getAllForPost.useQuery({ postId }, { enabled: !!postId });
 
     const createComment = api.comments.create.useMutation({
