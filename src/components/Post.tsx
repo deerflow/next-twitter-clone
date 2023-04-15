@@ -79,6 +79,7 @@ const Post: FC<Props> = ({ post, clickable }) => {
                     height={post.image.height}
                     blurDataURL={post.image.blurDataUrl}
                     placeholder='blur'
+                    className='mb-2 mt-1'
                 />
             )}
             <div className='mb-1 text-gray-600'>
