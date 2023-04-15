@@ -9,7 +9,7 @@ import { useAuth } from '@clerk/nextjs';
 
 const NavBar: FC = () => {
     const auth = useAuth();
-    const getCurrentUser = api.users.getCurrent.useQuery();
+    const getCurrentUser = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const router = useRouter();
 
     return (
