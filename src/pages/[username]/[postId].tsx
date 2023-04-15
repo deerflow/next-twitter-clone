@@ -133,6 +133,7 @@ const Post: NextPage = () => {
                                 {
                                     onSuccess: () => {
                                         setReplyContent('');
+                                        void context.comments.getAllForPost.invalidate({ postId: getPost.data.id });
                                     },
                                     onError: _ => toast.error('Something went wrong'),
                                 }
@@ -171,16 +172,18 @@ const Post: NextPage = () => {
                     </form>
                 )}
 
-                <div className='border-x-[1px] border-b-[1px] border-solid border-gray-200'>
-                    <h2 className='border-b-[1px] border-solid border-gray-200 p-4 text-lg font-medium'>
-                        Replies to{' '}
-                        <Link className='text-blue-500' href={`/${getPost.data.author.username}`}>
-                            @{getPost.data.author.username}
-                        </Link>{' '}
-                        :
-                    </h2>
-                    <CommentsList comments={getComments.data} isLoading={getComments.isLoading} />
-                </div>
+                {getComments.data && getComments.data.length > 0 && (
+                    <div className='border-x-[1px] border-solid border-gray-200'>
+                        <h2 className='border-b-[1px] border-solid border-gray-200 p-4 text-lg font-medium'>
+                            Replies to{' '}
+                            <Link className='text-blue-500' href={`/${getPost.data.author.username}`}>
+                                @{getPost.data.author.username}
+                            </Link>{' '}
+                            :
+                        </h2>
+                        <CommentsList comments={getComments.data} isLoading={getComments.isLoading} />
+                    </div>
+                )}
             </Layout>
         </>
     );
