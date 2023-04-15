@@ -25,7 +25,36 @@ const OnePost: NextPage = () => {
     const getCurrentUser = api.users.getCurrent.useQuery();
     const getComments = api.comments.getAllForPost.useQuery({ postId }, { enabled: !!postId });
 
-    const createComment = api.comments.create.useMutation();
+    const createComment = api.comments.create.useMutation({
+        onSuccess: () => {
+            setReplyContent('');
+            void context.comments.getAllForPost.invalidate({ postId: getPost.data.id });
+        },
+        onMutate: async ({ content, postId }) => {
+            const previousComments = context.comments.getAllForPost.getData({ postId });
+            if (getCurrentUser.data) {
+                await context.comments.getAllForPost.cancel({ postId });
+                context.comments.getAllForPost.setData({ postId }, old => {
+                    return [
+                        {
+                            id: 'optimistic',
+                            content,
+                            author: getCurrentUser.data,
+                            postId,
+                            authorId: getCurrentUser.data.id,
+                            createdAt: new Date(),
+                        },
+                        ...(old || []),
+                    ];
+                });
+            }
+            return previousComments;
+        },
+        onError: (err, variables, previousComments) => {
+            toast.error(err.message);
+            context.comments.getAllForPost.setData({ postId: variables.postId }, previousComments);
+        },
+    });
 
     if (getPost.isLoading || getComments.isLoading || !auth.isLoaded || !username || !postId) {
         return <LoadingPage />;
@@ -65,16 +94,7 @@ const OnePost: NextPage = () => {
                         className='border-x-[1px] border-b-[1px] border-solid border-gray-200 p-4'
                         onSubmit={e => {
                             e.preventDefault();
-                            createComment.mutate(
-                                { content: replyContent, postId: getPost.data.id },
-                                {
-                                    onSuccess: () => {
-                                        setReplyContent('');
-                                        void context.comments.getAllForPost.invalidate({ postId: getPost.data.id });
-                                    },
-                                    onError: _ => toast.error('Something went wrong'),
-                                }
-                            );
+                            createComment.mutate({ content: replyContent, postId: getPost.data.id });
                         }}
                     >
                         <div className='flex justify-between'>

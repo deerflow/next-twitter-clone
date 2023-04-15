@@ -43,7 +43,6 @@ const Home: NextPage = () => {
             if (getCurrentUser.data) {
                 await context.posts.getAll.cancel();
                 context.posts.getAll.setData(undefined, old => {
-                    if (!old) return old;
                     return [
                         {
                             author: {
@@ -71,7 +70,7 @@ const Home: NextPage = () => {
                                 comments: 0,
                             },
                         },
-                        ...old,
+                        ...(old || []),
                     ];
                 });
             }
