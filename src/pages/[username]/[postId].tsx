@@ -107,6 +107,9 @@ const Post: NextPage = () => {
                             alt='Upload image'
                             width={getPost.data.image.width}
                             height={getPost.data.image.height}
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                            blurDataURL={getPost.data.image.blurDataUrl}
+                            placeholder='blur'
                         />
                     )}
                 </div>

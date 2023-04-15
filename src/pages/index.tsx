@@ -1,6 +1,6 @@
 import { type NextPage } from 'next';
 import Head from 'next/head';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { api } from '~/utils/api';
 import TextAreaAutoSize from 'react-textarea-autosize';
 import { useAuth } from '@clerk/nextjs';
@@ -70,7 +70,8 @@ const Home: NextPage = () => {
                                 e.preventDefault();
                                 if (uploadedImage) {
                                     console.log('image');
-                                    if (!uploadedImageHeight) return toast.error('Image does not have required field height');
+                                    if (!uploadedImageHeight)
+                                        return toast.error('Image does not have required field height');
                                     createPost.mutate(
                                         {
                                             content,

@@ -85,6 +85,8 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
                             src={post.image.url}
                             width={post.image.width}
                             height={post.image.height}
+                            blurDataURL={post.image.blurDataUrl}
+                            placeholder='blur'
                         />
                     )}
                 </div>

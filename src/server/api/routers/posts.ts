@@ -6,6 +6,7 @@ import { TRPCError } from '@trpc/server';
 import ratelimit from '~/server/rateLimit';
 import imageKit from '~/server/imageKit';
 import { applyImageKitParams } from '~/server/fns/imageKit';
+import { getPlaiceholder } from 'plaiceholder';
 
 const posts = createTRPCRouter({
     getAll: publicProcedure.query(async ({ ctx }) => {
@@ -78,16 +79,26 @@ const posts = createTRPCRouter({
                     fileName: ctx.auth.userId,
                     folder: 'posts',
                 });
+
                 const url = applyImageKitParams(
                     result.url,
                     `tr:w-${input.imageWidth},h-${input.imageHeight},c-maintain-aspect-ratio`
                 );
+
+                const { base64: blurDataUrl } = await getPlaiceholder(url);
+
                 return ctx.prisma.post.create({
                     data: {
                         content: input.content,
                         author: ctx.auth.userId,
                         image: {
-                            create: { url, width: input.imageWidth, height: input.imageHeight, fileId: result.fileId },
+                            create: {
+                                url,
+                                width: input.imageWidth,
+                                height: input.imageHeight,
+                                fileId: result.fileId,
+                                blurDataUrl,
+                            },
                         },
                     },
                 });
