@@ -6,13 +6,32 @@ import Image from 'next/image';
 import { type RouterOutput } from '~/server/api/root';
 import { useAuth } from '@clerk/nextjs';
 import { api } from '~/utils/api';
+import toast from 'react-hot-toast';
 
-const CommentsList: FC<Props> = ({ comments }) => {
+const CommentsList: FC<Props> = ({ comments, isLoading, postId }) => {
     const auth = useAuth();
     const context = api.useContext();
 
     const user = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
-    const deleteComment = api.comments.delete.useMutation();
+    const deleteComment = api.comments.delete.useMutation({
+        onMutate: async ({ id: commentId }) => {
+            await context.comments.getAllForPost.cancel({ postId });
+            const previousComments = context.comments.getAllForPost.getData({ postId });
+            context.comments.getAllForPost.setData({ postId }, old => {
+                return old?.filter(comment => comment.id !== commentId);
+            });
+            return previousComments;
+        },
+        onError: (error, _variables, previousComments) => {
+            toast.error(error.message);
+            context.comments.getAllForPost.setData({ postId }, previousComments);
+        },
+        onSuccess: (comment, _) => {
+            void context.comments.getAllForPost.invalidate({
+                postId: comment.postId,
+            });
+        },
+    });
 
     if (!comments) return null;
 
@@ -54,16 +73,7 @@ const CommentsList: FC<Props> = ({ comments }) => {
                                                 className='h-5 w-5'
                                                 onClick={e => {
                                                     e.stopPropagation();
-                                                    void deleteComment.mutate(
-                                                        { id: comment.id },
-                                                        {
-                                                            onSuccess: () => {
-                                                                void context.comments.getAllForPost.invalidate({
-                                                                    postId: comment.postId,
-                                                                });
-                                                            },
-                                                        }
-                                                    );
+                                                    void deleteComment.mutate({ id: comment.id });
                                                 }}
                                             />
                                         ) : (
@@ -93,6 +103,7 @@ const CommentsList: FC<Props> = ({ comments }) => {
 interface Props {
     comments?: RouterOutput['comments']['getAllForPost'];
     isLoading?: boolean;
+    postId: string;
 }
 
 export default CommentsList;
