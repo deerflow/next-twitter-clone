@@ -31,7 +31,57 @@ const Home: NextPage = () => {
 
     const getCurrentUser = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const getPosts = api.posts.getAll.useQuery();
-    const createPost = api.posts.create.useMutation();
+    const createPost = api.posts.create.useMutation({
+        onSuccess: () => {
+            setContent('');
+            setUploadedImage('');
+            setUploadedImageHeight(null);
+            void context.posts.getAll.invalidate();
+        },
+        onMutate: async () => {
+            const previousPosts = context.posts.getAll.getData();
+            if (getCurrentUser.data) {
+                await context.posts.getAll.cancel();
+                context.posts.getAll.setData(undefined, old => {
+                    if (!old) return old;
+                    return [
+                        {
+                            author: {
+                                username: getCurrentUser.data.username,
+                                id: getCurrentUser.data.id,
+                                email: getCurrentUser.data.email,
+                                avatar: getCurrentUser.data.avatar,
+                            },
+                            id: 'optimistic',
+                            content,
+                            createdAt: new Date(),
+                            image:
+                                uploadedImage && uploadedImageHeight
+                                    ? {
+                                          url: uploadedImage,
+                                          height: uploadedImageHeight,
+                                          width: 568,
+                                          id: 'optimistic',
+                                          blurDataUrl: '',
+                                          createdAt: new Date(),
+                                          fileId: 'optimistic',
+                                      }
+                                    : null,
+                            _count: {
+                                comments: 0,
+                            },
+                        },
+                        ...old,
+                    ];
+                });
+            }
+            return previousPosts;
+        },
+        onError: (err, _variables, previousPosts) => {
+            toast.error(err.message);
+            context.posts.getAll.setData(undefined, previousPosts);
+        },
+    });
 
     const [content, setContent] = useState('');
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -70,23 +120,12 @@ const Home: NextPage = () => {
                                     console.log('image');
                                     if (!uploadedImageHeight)
                                         return toast.error('Image does not have required field height');
-                                    createPost.mutate(
-                                        {
-                                            content,
-                                            imageSrc: uploadedImage,
-                                            imageHeight: uploadedImageHeight,
-                                            imageWidth: 568,
-                                        },
-                                        {
-                                            onSuccess: () => {
-                                                setContent('');
-                                                setUploadedImage('');
-                                                setUploadedImageHeight(null);
-                                                void context.posts.getAll.invalidate();
-                                            },
-                                            onError: e => toast.error(e.message),
-                                        }
-                                    );
+                                    createPost.mutate({
+                                        content,
+                                        imageSrc: uploadedImage,
+                                        imageHeight: uploadedImageHeight,
+                                        imageWidth: 568,
+                                    });
                                 } else {
                                     createPost.mutate(
                                         { content },
