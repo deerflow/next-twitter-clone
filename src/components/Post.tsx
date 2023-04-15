@@ -24,7 +24,15 @@ const Post: FC<Props> = ({ post, clickable }) => {
                 return old?.filter(post => post.id !== postId);
             });
 
-            return previousPosts;
+            if (user.data?.username) {
+                const previousUserPosts = context.posts.getUserPosts.getData({ username: user.data?.username });
+                context.posts.getUserPosts.setData({ username: user.data.username }, old => {
+                    return old?.filter(post => post.id !== postId);
+                });
+                return { previousPosts, previousUserPosts };
+            }
+
+            return { previousPosts, previousUserPosts: null };
         },
         onSuccess: () => {
             void context.posts.getAll.invalidate();
@@ -32,9 +40,14 @@ const Post: FC<Props> = ({ post, clickable }) => {
                 username: user.data?.username,
             });
         },
-        onError: (error, _variables, previousPosts) => {
+        onError: (error, _variables, prev) => {
             toast.error(error.message);
-            context.posts.getAll.setData(undefined, previousPosts);
+            context.posts.getAll.setData(undefined, prev?.previousPosts);
+            if (prev?.previousUserPosts)
+                context.posts.getUserPosts.setData(
+                    { username: user.data?.username as string },
+                    prev?.previousUserPosts
+                );
         },
     });
 
