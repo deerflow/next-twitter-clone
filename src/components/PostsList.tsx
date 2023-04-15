@@ -96,7 +96,7 @@ const PostsList: FC<Props> = ({ posts, isLoading }) => {
 };
 
 interface Props {
-    posts?: (Omit<Post, 'author'> & { author: RouterOutput['users']['get'] } & { image: Image })[] | null;
+    posts?: (Omit<Post, 'author'> & { author: RouterOutput['users']['get'] } & { image: Image | null })[] | null;
     isLoading?: boolean;
 }
 
