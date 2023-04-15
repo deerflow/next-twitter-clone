@@ -7,14 +7,13 @@ import { useAuth } from '@clerk/nextjs';
 import Layout from '~/components/Layout';
 import PostsList from '~/components/PostsList';
 import LoadingPage from '~/components/LoadingPage';
-import Spinner from '~/components/Spinner';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { fileToBase64 } from 'deerflow-utils';
 import NextImage from 'next/image';
 
 import { type FC } from 'react';
-import { AiOutlineFileImage } from 'react-icons/ai';
+import { AiOutlineClose, AiOutlineFileImage } from 'react-icons/ai';
 
 const PageHead: FC = () => {
     return (
@@ -103,7 +102,7 @@ const Home: NextPage = () => {
                                 }
                             }}
                         >
-                            <div className='border-[1px] border-solid border-gray-200 p-4'>
+                            <div className='border-x-[1px] border-solid border-gray-200 p-4'>
                                 <div className='flex justify-between'>
                                     <Link href={`/${getCurrentUser.data?.username as string}`}>
                                         <NextImage
@@ -129,7 +128,6 @@ const Home: NextPage = () => {
                                             type='submit'
                                             disabled={content.length === 0 || createPost.isLoading}
                                         >
-                                            {createPost.isLoading && <Spinner size={4} className='mr-2' />}
                                             Tweet
                                         </button>
                                     </div>
@@ -141,8 +139,18 @@ const Home: NextPage = () => {
                                             height: uploadedImageHeight ? uploadedImageHeight : undefined,
                                         }}
                                     >
+                                        <button
+                                            type='button'
+                                            className='absolute left-1 top-4 z-10 rounded-full bg-gray-800 p-2 transition-colors duration-200 hover:bg-gray-700'
+                                            onClick={() => {
+                                                setUploadedImage(null);
+                                                setUploadedImageHeight(null);
+                                            }}
+                                        >
+                                            <AiOutlineClose color='white' />
+                                        </button>
                                         <NextImage
-                                            className={`object-contain`}
+                                            className='object-contain'
                                             src={uploadedImage}
                                             alt='Uploaded image'
                                             fill
@@ -150,7 +158,7 @@ const Home: NextPage = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className='flex border-x-[1px] border-b-[1px] border-solid border-gray-200 p-3'>
+                            <div className='flex border-x-[1px] border-b-[1px] border-solid border-gray-200 px-3 pb-3'>
                                 <label
                                     htmlFor='upload-image'
                                     className='block cursor-pointer rounded-full p-2 transition-colors duration-200 hover:bg-gray-200'
