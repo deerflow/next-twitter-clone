@@ -32,7 +32,9 @@ const OnePost: NextPage = () => {
         },
         onMutate: async ({ content, postId }) => {
             const previousComments = context.comments.getAllForPost.getData({ postId });
+            const previousContent = replyContent;
             if (getCurrentUser.data) {
+                setReplyContent('');
                 await context.comments.getAllForPost.cancel({ postId });
                 context.comments.getAllForPost.setData({ postId }, old => {
                     return [
@@ -48,11 +50,12 @@ const OnePost: NextPage = () => {
                     ];
                 });
             }
-            return previousComments;
+            return { previousComments, previousContent };
         },
-        onError: (err, variables, previousComments) => {
+        onError: (err, variables, previousState) => {
             toast.error(err.message);
-            context.comments.getAllForPost.setData({ postId: variables.postId }, previousComments);
+            setReplyContent(previousState?.previousContent as string);
+            context.comments.getAllForPost.setData({ postId: variables.postId }, previousState?.previousComments);
         },
     });
 

@@ -33,14 +33,19 @@ const Home: NextPage = () => {
     const getPosts = api.posts.getAll.useQuery();
     const createPost = api.posts.create.useMutation({
         onSuccess: () => {
-            setContent('');
-            setUploadedImage('');
-            setUploadedImageHeight(null);
             void context.posts.getAll.invalidate();
         },
         onMutate: async () => {
             const previousPosts = context.posts.getAll.getData();
+            const [previousContent, previousUploadedImage, previousUploadedImageHeight] = [
+                content,
+                uploadedImage,
+                uploadedImageHeight,
+            ];
             if (getCurrentUser.data) {
+                setContent('');
+                setUploadedImage('');
+                setUploadedImageHeight(null);
                 await context.posts.getAll.cancel();
                 context.posts.getAll.setData(undefined, old => {
                     return [
@@ -61,7 +66,7 @@ const Home: NextPage = () => {
                                           height: uploadedImageHeight,
                                           width: 568,
                                           id: 'optimistic',
-                                          blurDataUrl: '',
+                                          blurDataUrl: uploadedImage,
                                           createdAt: new Date(),
                                           fileId: 'optimistic',
                                       }
@@ -74,11 +79,14 @@ const Home: NextPage = () => {
                     ];
                 });
             }
-            return previousPosts;
+            return { previousPosts, previousContent, previousUploadedImage, previousUploadedImageHeight };
         },
-        onError: (err, _variables, previousPosts) => {
+        onError: (err, _variables, previousState) => {
             toast.error(err.message);
-            context.posts.getAll.setData(undefined, previousPosts);
+            setContent(previousState?.previousContent as string);
+            setUploadedImage(previousState?.previousUploadedImage || null);
+            setUploadedImageHeight(previousState?.previousUploadedImageHeight || null);
+            context.posts.getAll.setData(undefined, previousState?.previousPosts);
         },
     });
 
