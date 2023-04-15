@@ -8,12 +8,35 @@ import Spinner from './Spinner';
 import { useAuth } from '@clerk/nextjs';
 import { api } from '~/utils/api';
 import Image from 'next/image';
+import toast from 'react-hot-toast';
 
 const Post: FC<Props> = ({ post, clickable }) => {
     const auth = useAuth();
     const context = api.useContext();
     const user = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
-    const deletePost = api.posts.delete.useMutation();
+    const deletePost = api.posts.delete.useMutation({
+        onMutate: async ({ postId }) => {
+            await Promise.all([context.posts.getAll.cancel(), context.posts.getUserPosts.cancel()]);
+
+            const previousPosts = context.posts.getAll.getData();
+
+            context.posts.getAll.setData(undefined, old => {
+                return old?.filter(post => post.id !== postId);
+            });
+
+            return previousPosts;
+        },
+        onSuccess: () => {
+            void context.posts.getAll.invalidate();
+            void context.posts.getUserPosts.invalidate({
+                username: user.data?.username,
+            });
+        },
+        onError: (error, _variables, previousPosts) => {
+            toast.error(error.message);
+            context.posts.getAll.setData(undefined, previousPosts);
+        },
+    });
 
     return (
         <div
@@ -52,17 +75,7 @@ const Post: FC<Props> = ({ post, clickable }) => {
                                 className='h-5 w-5'
                                 onClick={e => {
                                     e.stopPropagation();
-                                    void deletePost.mutate(
-                                        { postId: post.id },
-                                        {
-                                            onSuccess: () => {
-                                                void context.posts.getAll.invalidate();
-                                                void context.posts.getUserPosts.invalidate({
-                                                    username: user.data?.username,
-                                                });
-                                            },
-                                        }
-                                    );
+                                    deletePost.mutate({ postId: post.id });
                                 }}
                             />
                         ) : (
