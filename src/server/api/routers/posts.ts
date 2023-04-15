@@ -9,7 +9,7 @@ import { applyImageKitParams } from '~/server/fns/imageKit';
 
 const posts = createTRPCRouter({
     getAll: publicProcedure.query(async ({ ctx }) => {
-        const posts = await ctx.prisma.post.findMany({ orderBy: { createdAt: 'desc' } });
+        const posts = await ctx.prisma.post.findMany({ orderBy: { createdAt: 'desc' }, include: { image: true } });
         const authors = await clerkClient.users.getUserList({ userId: posts.map(post => post.author) });
         const postsWithAuthors = posts.map(post => {
             const author = authors.find(author => author.id === post.author);
@@ -30,11 +30,15 @@ const posts = createTRPCRouter({
     getUserPosts: publicProcedure.input(z.object({ username: z.string() })).query(async ({ ctx, input }) => {
         const usersCaller = users.createCaller(ctx);
         const user = await usersCaller.get({ username: input.username });
-        const posts = await ctx.prisma.post.findMany({ where: { author: user.id }, orderBy: { createdAt: 'desc' } });
+        const posts = await ctx.prisma.post.findMany({
+            where: { author: user.id },
+            orderBy: { createdAt: 'desc' },
+            include: { image: true },
+        });
         return posts.map(post => ({ ...post, author: user }));
     }),
     getOne: publicProcedure.input(z.object({ postId: z.string() })).query(async ({ ctx, input }) => {
-        const post = await ctx.prisma.post.findUnique({ where: { id: input.postId } });
+        const post = await ctx.prisma.post.findUnique({ where: { id: input.postId }, include: { image: true } });
         if (!post) throw new TRPCError({ message: 'Post not found', code: 'NOT_FOUND' });
         const author = await clerkClient.users.getUser(post.author);
         return {
@@ -82,7 +86,9 @@ const posts = createTRPCRouter({
                     data: {
                         content: input.content,
                         author: ctx.auth.userId,
-                        image: { create: { url, width: input.imageWidth, height: input.imageHeight } },
+                        image: {
+                            create: { url, width: input.imageWidth, height: input.imageHeight, fileId: result.fileId },
+                        },
                     },
                 });
             }
@@ -94,10 +100,15 @@ const posts = createTRPCRouter({
             });
         }),
     delete: privateProcedure.input(z.object({ postId: z.string() })).mutation(async ({ ctx, input }) => {
-        const post = await ctx.prisma.post.findUnique({ where: { id: input.postId } });
+        const post = await ctx.prisma.post.findUnique({ where: { id: input.postId }, include: { image: true } });
         if (!post) throw new TRPCError({ message: 'Post not found', code: 'NOT_FOUND' });
         if (post.author !== ctx.auth.userId)
             throw new TRPCError({ message: "You're not allowed to delete this twitt", code: 'UNAUTHORIZED' });
+        if (post.image?.fileId) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            await imageKit.deleteFile(post.image.fileId);
+        }
+
         return ctx.prisma.post.delete({ where: { id: input.postId } });
     }),
 });

@@ -29,8 +29,9 @@ model Post {
 model Image {
     id              String   @id @default(cuid())
     createdAt       DateTime @default(now())
-    post            Post     @relation(fields: [id], references: [id])
+    post            Post     @relation(fields: [id], references: [id], onDelete: Cascade)
     width           Int
     height          Int
     url             String
+    fileId          String
 }

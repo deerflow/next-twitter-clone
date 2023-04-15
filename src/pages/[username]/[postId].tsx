@@ -49,7 +49,6 @@ const Post: NextPage = () => {
                 <link rel='icon' href='/favicon.svg' />
             </Head>
             <Layout>
-                {PageHead}
                 <div className='flex-col break-words border-x-[1px] border-b-[1px] border-solid border-gray-200 p-4'>
                     <div className='mb-4 flex items-center'>
                         <Link href='/' className='rounded-full p-2 transition-colors duration-200 hover:bg-gray-200'>

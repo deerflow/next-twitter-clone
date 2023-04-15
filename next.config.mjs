@@ -19,7 +19,7 @@ const config = {
         defaultLocale: 'en',
     },
     images: {
-        domains: ['www.gravatar.com', 'images.clerk.dev'],
+        domains: ['www.gravatar.com', 'images.clerk.dev', 'ik.imagekit.io'],
     },
 };
 export default config;
