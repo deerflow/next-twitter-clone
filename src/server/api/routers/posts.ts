@@ -4,6 +4,8 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from '~/server/ap
 import users from './users';
 import { TRPCError } from '@trpc/server';
 import ratelimit from '~/server/rateLimit';
+import imageKit from '~/server/imageKit';
+import { applyImageKitParams } from '~/server/fns/imageKit';
 
 const posts = createTRPCRouter({
     getAll: publicProcedure.query(async ({ ctx }) => {
@@ -46,12 +48,50 @@ const posts = createTRPCRouter({
         };
     }),
     create: privateProcedure
-        .input(z.object({ content: z.string().min(1).max(280) }))
+        .input(
+            z.object({
+                content: z.string().min(1).max(280),
+                imageSrc: z.string().url().optional(),
+                imageWidth: z.number().optional(),
+                imageHeight: z.number().optional(),
+            })
+        )
         .mutation(async ({ ctx, input }) => {
             const { success } = await ratelimit.limit(ctx.auth.userId);
             if (!success)
-                throw new TRPCError({ message: 'You can only make a twitt every 20 seconds', code: 'TOO_MANY_REQUESTS' });
-            return ctx.prisma.post.create({ data: { content: input.content, author: ctx.auth.userId } });
+                throw new TRPCError({
+                    message: 'You can only make a twitt every 20 seconds',
+                    code: 'TOO_MANY_REQUESTS',
+                });
+            if (input.imageSrc) {
+                if (!input.imageWidth || !input.imageHeight)
+                    throw new TRPCError({
+                        message: 'Image width and height are required when an image is provided',
+                        code: 'BAD_REQUEST',
+                    });
+                const result = await imageKit.upload({
+                    file: input.imageSrc,
+                    fileName: ctx.auth.userId,
+                    folder: 'posts',
+                });
+                const url = applyImageKitParams(
+                    result.url,
+                    `tr:w-${input.imageWidth},h-${input.imageHeight},c-maintain-aspect-ratio`
+                );
+                return ctx.prisma.post.create({
+                    data: {
+                        content: input.content,
+                        author: ctx.auth.userId,
+                        image: { create: { url, width: input.imageWidth, height: input.imageHeight } },
+                    },
+                });
+            }
+            return ctx.prisma.post.create({
+                data: {
+                    content: input.content,
+                    author: ctx.auth.userId,
+                },
+            });
         }),
     delete: privateProcedure.input(z.object({ postId: z.string() })).mutation(async ({ ctx, input }) => {
         const post = await ctx.prisma.post.findUnique({ where: { id: input.postId } });

@@ -36,9 +36,7 @@ const Home: NextPage = () => {
 
     const [content, setContent] = useState('');
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-    const [imageHeight, setImageHeight] = useState<number | null>(null);
-
-    const uploadedImageRef = useRef<HTMLImageElement>(null);
+    const [uploadedImageHeight, setUploadedImageHeight] = useState<number | null>(null);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.currentTarget.files?.[0];
@@ -47,7 +45,7 @@ const Home: NextPage = () => {
             const preloadImage = new Image();
             preloadImage.src = base64 as string;
             preloadImage.onload = () => {
-                setImageHeight((preloadImage.height / preloadImage.width) * 600);
+                setUploadedImageHeight(Math.round((preloadImage.height / preloadImage.width) * 600));
                 setUploadedImage(base64 as string);
             };
         }
@@ -68,17 +66,40 @@ const Home: NextPage = () => {
                     {auth.isSignedIn && (
                         <form
                             onSubmit={e => {
+                                console.log('submit');
                                 e.preventDefault();
-                                createPost.mutate(
-                                    { content },
-                                    {
-                                        onSuccess: () => {
-                                            setContent('');
-                                            void context.posts.getAll.invalidate();
+                                if (uploadedImage) {
+                                    console.log('image');
+                                    if (!uploadedImageHeight) return toast.error('Image does not have required field height');
+                                    createPost.mutate(
+                                        {
+                                            content,
+                                            imageSrc: uploadedImage,
+                                            imageHeight: uploadedImageHeight,
+                                            imageWidth: 568,
                                         },
-                                        onError: e => toast.error(e.message),
-                                    }
-                                );
+                                        {
+                                            onSuccess: () => {
+                                                setContent('');
+                                                setUploadedImage('');
+                                                setUploadedImageHeight(null);
+                                                void context.posts.getAll.invalidate();
+                                            },
+                                            onError: e => toast.error(e.message),
+                                        }
+                                    );
+                                } else {
+                                    createPost.mutate(
+                                        { content },
+                                        {
+                                            onSuccess: () => {
+                                                setContent('');
+                                                void context.posts.getAll.invalidate();
+                                            },
+                                            onError: e => toast.error(e.message),
+                                        }
+                                    );
+                                }
                             }}
                         >
                             <div className='border-[1px] border-solid border-gray-200 p-4'>
@@ -112,11 +133,11 @@ const Home: NextPage = () => {
                                         </button>
                                     </div>
                                 </div>
-                                {uploadedImage && imageHeight && (
+                                {uploadedImage && uploadedImageHeight && (
                                     <div
-                                        className={`relative h-[${imageHeight}px]`}
+                                        className={`relative h-[${uploadedImageHeight}px]`}
                                         style={{
-                                            height: imageHeight ? imageHeight : undefined,
+                                            height: uploadedImageHeight ? uploadedImageHeight : undefined,
                                         }}
                                     >
                                         <NextImage
@@ -124,7 +145,6 @@ const Home: NextPage = () => {
                                             src={uploadedImage}
                                             alt='Uploaded image'
                                             fill
-                                            ref={uploadedImageRef}
                                         />
                                     </div>
                                 )}
