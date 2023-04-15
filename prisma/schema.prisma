@@ -17,6 +17,7 @@ model Post {
     content   String   @db.VarChar(280)
     image     Image?
     comments  Comment[]
+    likes     Like[]
 }
 
 model Image {
@@ -35,6 +36,13 @@ model Comment {
     createdAt DateTime @default(now())
     authorId  String
     content   String   @db.VarChar(280)
+    post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+    postId    String
+}
+
+model Like {
+    id        String   @id @default(cuid())
+    authorId  String
     post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
     postId    String
 }

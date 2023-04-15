@@ -9,6 +9,7 @@ import superjson from 'superjson';
 import { createServerSideHelpers } from '@trpc/react-query/server';
 import images from './routers/images';
 import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server';
+import likes from './routers/likes';
 
 /**
  * This is the primary router for your server.
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
     posts,
     images,
     comments,
+    likes,
 });
 
 export const getSSG = (context: GetServerSidePropsContext) =>
