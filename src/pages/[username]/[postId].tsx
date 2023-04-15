@@ -56,7 +56,7 @@ const Post: NextPage = () => {
                         </Link>
                         <h1 className='ml-6 text-xl font-bold'>Twitt</h1>
                     </div>
-                    <div className='flex items-center'>
+                    <div className='mb-4 flex items-center'>
                         <div className='flex w-full'>
                             <Link href={`/${getPost.data.author.username}`}>
                                 <Image
@@ -101,6 +101,14 @@ const Post: NextPage = () => {
                             </button>
                         )}
                     </div>
+                    {getPost.data.image && (
+                        <Image
+                            src={getPost.data.image.url}
+                            alt='Upload image'
+                            width={getPost.data.image.width}
+                            height={getPost.data.image.height}
+                        />
+                    )}
                 </div>
             </Layout>
         </>
