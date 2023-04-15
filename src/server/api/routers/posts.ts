@@ -10,7 +10,10 @@ import { getPlaiceholder } from 'plaiceholder';
 
 const posts = createTRPCRouter({
     getAll: publicProcedure.query(async ({ ctx }) => {
-        const posts = await ctx.prisma.post.findMany({ orderBy: { createdAt: 'desc' }, include: { image: true } });
+        const posts = await ctx.prisma.post.findMany({
+            orderBy: { createdAt: 'desc' },
+            include: { image: true, _count: { select: { comments: true } } },
+        });
         const authors = await clerkClient.users.getUserList({ userId: posts.map(post => post.author) });
         const postsWithAuthors = posts.map(post => {
             const author = authors.find(author => author.id === post.author);
@@ -34,7 +37,7 @@ const posts = createTRPCRouter({
         const posts = await ctx.prisma.post.findMany({
             where: { author: user.id },
             orderBy: { createdAt: 'desc' },
-            include: { image: true },
+            include: { image: true, _count: { select: { comments: true } } },
         });
         return posts.map(post => ({ ...post, author: user }));
     }),

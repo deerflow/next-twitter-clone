@@ -179,7 +179,7 @@ const Post: NextPage = () => {
                         </Link>{' '}
                         :
                     </h2>
-                    <CommentsList comments={getComments.data} />
+                    <CommentsList comments={getComments.data} isLoading={getComments.isLoading} />
                 </div>
             </Layout>
         </>
