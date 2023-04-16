@@ -63,6 +63,7 @@ const Post: FC<Props> = ({ post, clickable }) => {
             void context.posts.getUserPosts.invalidate({
                 username: user.data?.username,
             });
+            void context.posts.getOne.invalidate({ postId: post.id });
         },
     });
 
@@ -72,6 +73,7 @@ const Post: FC<Props> = ({ post, clickable }) => {
             void context.posts.getUserPosts.invalidate({
                 username: user.data?.username,
             });
+            void context.posts.getOne.invalidate({ postId: post.id });
         },
     });
 
