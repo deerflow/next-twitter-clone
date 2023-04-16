@@ -33,16 +33,43 @@ const ProfilePage: NextPage = () => {
         onSuccess: () => {
             void context.follows.getForUser.invalidate({ userId: getUser.data?.id as string });
         },
-        onError: (err, _variables, prev) => {
+        onMutate: async ({ userId }) => {
+            await context.follows.getForUser.cancel();
+            const previousFollows = context.follows.getForUser.getData({ userId });
+            context.follows.getForUser.setData({ userId }, prev => {
+                if (!prev || !getCurrentUser.data) return prev;
+                return {
+                    ...prev,
+                    followers: [...prev.followers, getCurrentUser.data.id],
+                };
+            });
+            return previousFollows;
+        },
+        onError: (err, variables, prev) => {
             toast.error(err.message);
+            context.follows.getForUser.setData(variables, prev);
         },
     });
+
     const deleteFollow = api.follows.delete.useMutation({
         onSuccess: () => {
             void context.follows.getForUser.invalidate({ userId: getUser.data?.id as string });
         },
-        onError: (err, _variables, prev) => {
+        onMutate: async ({ userId }) => {
+            await context.follows.getForUser.cancel();
+            const previousFollows = context.follows.getForUser.getData({ userId });
+            context.follows.getForUser.setData({ userId }, prev => {
+                if (!prev || !getCurrentUser.data) return prev;
+                return {
+                    ...prev,
+                    followers: prev.followers.filter(followerId => followerId !== getCurrentUser.data.id),
+                };
+            });
+            return previousFollows;
+        },
+        onError: (err, variables, prev) => {
             toast.error(err.message);
+            context.follows.getForUser.setData(variables, prev);
         },
     });
 
