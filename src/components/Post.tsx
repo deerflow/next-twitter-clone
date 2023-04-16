@@ -65,6 +65,57 @@ const Post: FC<Props> = ({ post, clickable }) => {
             });
             void context.posts.getOne.invalidate({ postId: post.id });
         },
+        onMutate: async ({ postId }) => {
+            const [previousPosts, previousUserPosts, previousPost] = [
+                context.posts.getAll.getData(),
+                context.posts.getUserPosts.getData({ username: post.author.username }),
+                context.posts.getOne.getData({ postId }),
+            ];
+            if (auth.userId) {
+                await Promise.all([
+                    context.posts.getAll.cancel(),
+                    context.posts.getUserPosts.cancel({ username: post.author.username }),
+                    context.posts.getOne.cancel({ postId }),
+                ]);
+
+                context.posts.getAll.setData(undefined, old => {
+                    return old?.map(post => {
+                        if (post.id === postId) {
+                            return {
+                                ...post,
+                                likes: [...post.likes, { id: 'optimistic', authorId: auth.userId, postId }],
+                            };
+                        }
+                        return post;
+                    });
+                });
+
+                context.posts.getUserPosts.setData({ username: post.author.username }, old => {
+                    return old?.map(post => {
+                        if (post.id === postId) {
+                            return {
+                                ...post,
+                                likes: [...post.likes, { id: 'optimistic', authorId: auth.userId, postId }],
+                            };
+                        }
+                        return post;
+                    });
+                });
+
+                context.posts.getOne.setData({ postId }, old => {
+                    if (!old) return old;
+                    return { ...old, likes: [...old.likes, { id: 'optimistic', authorId: auth.userId, postId }] };
+                });
+            }
+
+            return { previousPosts, previousUserPosts, previousPost };
+        },
+        onError: (error, _variables, previousState) => {
+            toast.error(error.message);
+            context.posts.getAll.setData(undefined, previousState?.previousPosts);
+            context.posts.getUserPosts.setData({ username: post.author.username }, previousState?.previousUserPosts);
+            context.posts.getOne.setData({ postId: post.id }, previousState?.previousPost);
+        },
     });
 
     const deleteLike = api.likes.delete.useMutation({
@@ -74,6 +125,57 @@ const Post: FC<Props> = ({ post, clickable }) => {
                 username: user.data?.username,
             });
             void context.posts.getOne.invalidate({ postId: post.id });
+        },
+        onMutate: async ({ postId }) => {
+            const [previousPosts, previousUserPosts, previousPost] = [
+                context.posts.getAll.getData(),
+                context.posts.getUserPosts.getData({ username: post.author.username }),
+                context.posts.getOne.getData({ postId }),
+            ];
+            if (auth.userId) {
+                await Promise.all([
+                    context.posts.getAll.cancel(),
+                    context.posts.getUserPosts.cancel({ username: post.author.username }),
+                    context.posts.getOne.cancel({ postId }),
+                ]);
+
+                context.posts.getAll.setData(undefined, old => {
+                    return old?.map(post => {
+                        if (post.id === postId) {
+                            return {
+                                ...post,
+                                likes: post.likes.filter(like => like.authorId !== auth.userId),
+                            };
+                        }
+                        return post;
+                    });
+                });
+
+                context.posts.getUserPosts.setData({ username: post.author.username }, old => {
+                    return old?.map(post => {
+                        if (post.id === postId) {
+                            return {
+                                ...post,
+                                likes: post.likes.filter(like => like.authorId !== auth.userId),
+                            };
+                        }
+                        return post;
+                    });
+                });
+
+                context.posts.getOne.setData({ postId }, old => {
+                    if (!old) return old;
+                    return { ...old, likes: old.likes.filter(like => like.authorId !== auth.userId) };
+                });
+            }
+
+            return { previousPosts, previousUserPosts, previousPost };
+        },
+        onError: (error, _variables, previousState) => {
+            toast.error(error.message);
+            context.posts.getAll.setData(undefined, previousState?.previousPosts);
+            context.posts.getUserPosts.setData({ username: post.author.username }, previousState?.previousUserPosts);
+            context.posts.getOne.setData({ postId: post.id }, previousState?.previousPost);
         },
     });
 
