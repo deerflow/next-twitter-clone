@@ -7,6 +7,7 @@ import ratelimit from '~/server/rateLimit';
 import imageKit from '~/server/imageKit';
 import { applyImageKitParams } from '~/server/fns/imageKit';
 import { getPlaiceholder } from 'plaiceholder';
+import follows from './follows';
 
 const posts = createTRPCRouter({
     getAll: publicProcedure.query(async ({ ctx }) => {
@@ -30,7 +31,6 @@ const posts = createTRPCRouter({
         });
         return postsWithAuthors;
     }),
-
     getUserPosts: publicProcedure.input(z.object({ username: z.string() })).query(async ({ ctx, input }) => {
         const usersCaller = users.createCaller(ctx);
         const user = await usersCaller.get({ username: input.username });
@@ -40,6 +40,30 @@ const posts = createTRPCRouter({
             include: { image: true, _count: { select: { comments: true } }, likes: true },
         });
         return posts.map(post => ({ ...post, author: user }));
+    }),
+    getFollowingPosts: privateProcedure.query(async ({ ctx }) => {
+        const followsCaller = follows.createCaller(ctx);
+        const following = await followsCaller.getFollowing();
+        const posts = await ctx.prisma.post.findMany({
+            where: { author: { in: following } },
+            orderBy: { createdAt: 'desc' },
+            include: { image: true, _count: { select: { comments: true } }, likes: true },
+        });
+        const authors = await clerkClient.users.getUserList({ userId: posts.map(post => post.author) });
+        const postsWithAuthors = posts.map(post => {
+            const author = authors.find(author => author.id === post.author);
+            if (!author) throw new TRPCError({ message: 'Author not found', code: 'NOT_FOUND' });
+            return {
+                ...post,
+                author: {
+                    id: author.id,
+                    username: author.username as string,
+                    email: author.emailAddresses[0]?.emailAddress as string,
+                    avatar: author.profileImageUrl,
+                },
+            };
+        });
+        return postsWithAuthors;
     }),
     getOne: publicProcedure.input(z.object({ postId: z.string() })).query(async ({ ctx, input }) => {
         const post = await ctx.prisma.post.findUnique({

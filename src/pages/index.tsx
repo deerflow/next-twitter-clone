@@ -31,6 +31,8 @@ const Home: NextPage = () => {
 
     const getCurrentUser = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const getPosts = api.posts.getAll.useQuery();
+    const getFollowingPosts = api.posts.getFollowingPosts.useQuery(undefined, { enabled: auth.isSignedIn });
+
     const createPost = api.posts.create.useMutation({
         onSuccess: () => {
             void context.posts.getAll.invalidate();
@@ -74,6 +76,7 @@ const Home: NextPage = () => {
                             _count: {
                                 comments: 0,
                             },
+                            likes: [],
                         },
                         ...(old || []),
                     ];
@@ -93,6 +96,7 @@ const Home: NextPage = () => {
     const [content, setContent] = useState('');
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [uploadedImageHeight, setUploadedImageHeight] = useState<number | null>(null);
+    const [selectedTab, setSelectedTab] = useState<'all' | 'following'>('all');
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.currentTarget.files?.[0];
@@ -119,6 +123,25 @@ const Home: NextPage = () => {
             <PageHead />
             <Layout>
                 <div className='w-[600px]'>
+                    <header className='border-x-[1px] border-b-[1px] border-solid border-gray-200 pt-3'>
+                        <h1 className='mb-3 ml-4 text-xl font-bold'>Home</h1>
+                        {auth.isSignedIn && (
+                            <ul className='flex justify-around'>
+                                <div
+                                    className='flex w-1/2 cursor-pointer justify-center p-3.5 transition-colors duration-200 hover:bg-gray-200'
+                                    onClick={() => setSelectedTab('all')}
+                                >
+                                    <li className={`${selectedTab === 'all' ? 'font-bold' : ''}`}>All</li>
+                                </div>
+                                <div
+                                    className='flex w-1/2 cursor-pointer justify-center p-3.5 transition-colors duration-200 hover:bg-gray-200'
+                                    onClick={() => setSelectedTab('following')}
+                                >
+                                    <li className={`${selectedTab === 'following' ? 'font-bold' : ''}`}>Following</li>
+                                </div>
+                            </ul>
+                        )}
+                    </header>
                     {auth.isSignedIn && (
                         <form
                             onSubmit={e => {
@@ -222,7 +245,11 @@ const Home: NextPage = () => {
                     )}
 
                     <div className={getPosts.isLoading ? '' : 'border-[1px] border-y-0 border-solid'}>
-                        <PostsList posts={getPosts.data} isLoading={getPosts.isLoading} clickable={true} />
+                        <PostsList
+                            posts={selectedTab === 'all' ? getPosts.data : getFollowingPosts.data}
+                            isLoading={selectedTab === 'all' ? getPosts.isLoading : getFollowingPosts.isLoading}
+                            clickable={true}
+                        />
                     </div>
                 </div>
             </Layout>

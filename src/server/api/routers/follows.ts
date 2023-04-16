@@ -13,6 +13,10 @@ const follows = createTRPCRouter({
             followers: followers.map(follow => follow.followerId),
         };
     }),
+    getFollowing: privateProcedure.query(async ({ ctx }) => { 
+        const follows = await ctx.prisma.follow.findMany({ where: { followerId: ctx.auth.userId } });
+        return follows.map(follow => follow.followingId);
+    }),
     create: privateProcedure.input(z.object({ userId: z.string() })).mutation(async ({ ctx, input }) => {
         const follow = await ctx.prisma.follow.findFirst({
             where: { followingId: input.userId, followerId: ctx.auth.userId },
