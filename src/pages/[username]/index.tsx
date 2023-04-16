@@ -73,9 +73,13 @@ const ProfilePage: NextPage = () => {
                                 height={120}
                                 className='h-[120px] w-[120px] rounded-full object-cover object-center'
                             />
-                            {getCurrentUser.data && getCurrentUser.data?.id === getUser.data?.id && (
+                            {getCurrentUser.data && getCurrentUser.data?.id === getUser.data?.id ? (
                                 <div>
                                     <Button onClick={() => setIsEditing(true)}>Edit profile</Button>
+                                </div>
+                            ) : (
+                                <div>
+                                    <Button black>Follow</Button>
                                 </div>
                             )}
                         </div>

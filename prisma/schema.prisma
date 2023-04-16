@@ -46,3 +46,9 @@ model Like {
     post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
     postId    String
 }
+
+model Follow {
+    id        String   @id @default(cuid())
+    followerId String
+    followingId String
+}
