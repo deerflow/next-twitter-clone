@@ -13,14 +13,48 @@ import { useMemo, useState } from 'react';
 import PostsList from '~/components/PostsList';
 import Page404 from '../404';
 import EditProfileModal from '~/components/EditProfileModal';
+import toast from 'react-hot-toast';
 
 const ProfilePage: NextPage = () => {
+    const context = api.useContext();
     const auth = useAuth();
     const getCurrentUser = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const router = useRouter();
     const username = router.query.username as string;
+
     const getUser = api.users.get.useQuery({ username }, { enabled: router.isReady });
     const getUserPosts = api.posts.getUserPosts.useQuery({ username }, { enabled: router.isReady });
+    const follows = api.follows.getForUser.useQuery(
+        { userId: getUser.data?.id as string },
+        { enabled: getUser.isSuccess }
+    );
+
+    const createFollow = api.follows.create.useMutation({
+        onSuccess: () => {
+            void context.follows.getForUser.invalidate({ userId: getUser.data?.id as string });
+        },
+        onError: (err, _variables, prev) => {
+            toast.error(err.message);
+        },
+    });
+    const deleteFollow = api.follows.delete.useMutation({
+        onSuccess: () => {
+            void context.follows.getForUser.invalidate({ userId: getUser.data?.id as string });
+        },
+        onError: (err, _variables, prev) => {
+            toast.error(err.message);
+        },
+    });
+
+    const isCurrentUserFollowing = useMemo(
+        () => !!getCurrentUser.data && follows.data?.followers.includes(getCurrentUser.data?.id),
+        [follows.data?.followers, getCurrentUser.data]
+    );
+
+    const isCurrentUserFollowed = useMemo(
+        () => !!getCurrentUser.data && follows.data?.following.includes(getCurrentUser.data?.id),
+        [follows.data?.following, getCurrentUser.data]
+    );
 
     const postsNumber = getUserPosts.data?.length || 0;
 
@@ -73,15 +107,32 @@ const ProfilePage: NextPage = () => {
                                 height={120}
                                 className='h-[120px] w-[120px] rounded-full object-cover object-center'
                             />
-                            {getCurrentUser.data && getCurrentUser.data?.id === getUser.data?.id ? (
-                                <div>
+                            <div>
+                                {getCurrentUser.data && getCurrentUser.data?.id === getUser.data?.id ? (
                                     <Button onClick={() => setIsEditing(true)}>Edit profile</Button>
-                                </div>
-                            ) : (
-                                <div>
-                                    <Button black>Follow</Button>
-                                </div>
-                            )}
+                                ) : (
+                                    <>
+                                        {isCurrentUserFollowing ? (
+                                            <Button
+                                                onClick={() =>
+                                                    deleteFollow.mutate({ userId: getUser.data?.id as string })
+                                                }
+                                            >
+                                                Unfollow
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                onClick={() =>
+                                                    createFollow.mutate({ userId: getUser.data?.id as string })
+                                                }
+                                                black
+                                            >
+                                                Follow
+                                            </Button>
+                                        )}
+                                    </>
+                                )}
+                            </div>
                         </div>
                         <div className='mt-3'>
                             <h1 className='text-xl font-bold'>{getUser.data?.username}</h1>

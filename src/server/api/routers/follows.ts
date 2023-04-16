@@ -8,7 +8,10 @@ const follows = createTRPCRouter({
             ctx.prisma.follow.findMany({ where: { followerId: input.userId } }),
             ctx.prisma.follow.findMany({ where: { followingId: input.userId } }),
         ]);
-        return { following, followers };
+        return {
+            following: following.map(follow => follow.followingId),
+            followers: followers.map(follow => follow.followerId),
+        };
     }),
     create: privateProcedure.input(z.object({ userId: z.string() })).mutation(async ({ ctx, input }) => {
         const follow = await ctx.prisma.follow.findFirst({
