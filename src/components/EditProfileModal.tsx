@@ -91,7 +91,7 @@ const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
 
     return (
         <div
-            className=' fixed left-0 top-0 flex h-screen w-full items-center justify-center bg-black/30 py-5'
+            className='fixed left-0 top-0 flex h-screen w-full items-center justify-center bg-black/30 py-5'
             onClick={() => setIsEditing(false)}
         >
             <form

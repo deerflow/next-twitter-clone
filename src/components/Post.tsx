@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import router from 'next/router';
-import { useMemo, type FC } from 'react';
+import { useMemo, type FC, useContext } from 'react';
 import { AiFillHeart, AiOutlineDelete, AiOutlineHeart } from 'react-icons/ai';
 import { FaRegComment } from 'react-icons/fa';
 import { type RouterOutput } from '~/server/api/root';
@@ -9,11 +9,14 @@ import { useAuth } from '@clerk/nextjs';
 import { api } from '~/utils/api';
 import Image from 'next/image';
 import usePostMutation from '~/hooks/usePostMutation';
+import { LoginModalContext } from './LoginModalProvider';
 
 const Post: FC<Props> = ({ post, clickable, onPostDeleteSuccess }) => {
     const auth = useAuth();
+    const { setIsOpen } = useContext(LoginModalContext);
     const user = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const { deletePost, createLike, deleteLike } = usePostMutation({ post, onPostDeleteSuccess });
+    
 
     const hasUserLikedThePost = useMemo(
         () => !!auth.userId && post.likes && post.likes.map(like => like.authorId).includes(auth.userId),
@@ -94,6 +97,7 @@ const Post: FC<Props> = ({ post, clickable, onPostDeleteSuccess }) => {
                     className='group ml-8 flex w-fit cursor-pointer items-center'
                     onClick={e => {
                         e.stopPropagation();
+                        if (!auth.isSignedIn) return setIsOpen?.(true);
                         hasUserLikedThePost
                             ? deleteLike.mutate({ postId: post.id })
                             : createLike.mutate({ postId: post.id });

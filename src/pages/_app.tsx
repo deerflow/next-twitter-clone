@@ -4,6 +4,7 @@ import { api } from '~/utils/api';
 import '~/styles/globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Toaster } from 'react-hot-toast';
+import LoginModalProvider from '~/components/LoginModalProvider';
 
 const inter = Inter({ weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] });
 
@@ -12,7 +13,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         <ClerkProvider {...pageProps}>
             <Toaster />
             <div className={inter.className}>
-                <Component {...pageProps} />
+                <LoginModalProvider>
+                    <Component {...pageProps} />
+                </LoginModalProvider>
             </div>
         </ClerkProvider>
     );

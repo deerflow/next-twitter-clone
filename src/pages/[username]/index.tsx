@@ -7,17 +7,19 @@ import Button from '~/components/Button';
 import { useAuth } from '@clerk/nextjs';
 import Head from 'next/head';
 import LoadingPage from '~/components/LoadingPage';
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import PostsList from '~/components/PostsList';
 import Page404 from '../404';
 import EditProfileModal from '~/components/EditProfileModal';
 import toast from 'react-hot-toast';
 import GoBackButton from '~/components/GoBackButton';
 import Link from 'next/link';
+import { LoginModalContext } from '~/components/LoginModalProvider';
 
 const ProfilePage: NextPage = () => {
     const context = api.useContext();
     const auth = useAuth();
+    const { setIsOpen } = useContext(LoginModalContext);
     const getCurrentUser = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const router = useRouter();
     const username = router.query.username as string;
@@ -144,9 +146,10 @@ const ProfilePage: NextPage = () => {
                                             </Button>
                                         ) : (
                                             <Button
-                                                onClick={() =>
-                                                    createFollow.mutate({ userId: getUser.data?.id as string })
-                                                }
+                                                onClick={() => {
+                                                    if (!auth.isSignedIn) return setIsOpen?.(true);
+                                                    createFollow.mutate({ userId: getUser.data?.id as string });
+                                                }}
                                                 black
                                             >
                                                 Follow

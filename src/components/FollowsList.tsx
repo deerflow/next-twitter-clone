@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { useMemo, type FC } from 'react';
+import { useMemo, type FC, useContext } from 'react';
 import { type RouterOutput } from '~/server/api/root';
 import Spinner from './Spinner';
 import Link from 'next/link';
@@ -7,10 +7,12 @@ import { useAuth } from '@clerk/nextjs';
 import { api } from '~/utils/api';
 import Button from './Button';
 import toast from 'react-hot-toast';
+import { LoginModalContext } from './LoginModalProvider';
 
 const FollowsList: FC<Props> = ({ follows, isLoading }) => {
     const auth = useAuth();
     const context = api.useContext();
+    const { setIsOpen } = useContext(LoginModalContext);
 
     const followsIds = api.follows.getIdsForUser.useQuery(
         { userId: auth.userId as string },
@@ -79,7 +81,13 @@ const FollowsList: FC<Props> = ({ follows, isLoading }) => {
                     {follow.isFollowing ? (
                         <Button onClick={() => deleteFollow.mutate({ userId: follow.id })}>Unfollow</Button>
                     ) : (
-                        <Button black onClick={() => createFollow.mutate({ userId: follow.id })}>
+                        <Button
+                            black
+                            onClick={() => {
+                                if (!auth.isSignedIn) return setIsOpen?.(true);
+                                createFollow.mutate({ userId: follow.id });
+                            }}
+                        >
                             Follow
                         </Button>
                     )}
