@@ -52,18 +52,21 @@ const usePostMutation = ({ post, onPostDeleteSuccess }: usePostMutationParams) =
                 username: user.data?.username,
             });
             void context.posts.getOne.invalidate({ postId: post.id });
+            void context.posts.getFollowingPosts.invalidate();
         },
         onMutate: async ({ postId }) => {
-            const [previousPosts, previousUserPosts, previousPost] = [
+            const [previousPosts, previousUserPosts, previousPost, previousFollowingPosts] = [
                 context.posts.getAll.getData(),
                 context.posts.getUserPosts.getData({ username: post.author.username }),
                 context.posts.getOne.getData({ postId }),
+                context.posts.getFollowingPosts.getData(),
             ];
             if (auth.userId) {
                 await Promise.all([
                     context.posts.getAll.cancel(),
                     context.posts.getUserPosts.cancel({ username: post.author.username }),
                     context.posts.getOne.cancel({ postId }),
+                    context.posts.getFollowingPosts.cancel(),
                 ]);
 
                 context.posts.getAll.setData(undefined, old => {
@@ -94,9 +97,21 @@ const usePostMutation = ({ post, onPostDeleteSuccess }: usePostMutationParams) =
                     if (!old) return old;
                     return { ...old, likes: [...old.likes, { id: 'optimistic', authorId: auth.userId, postId }] };
                 });
+
+                context.posts.getFollowingPosts.setData(undefined, old => {
+                    return old?.map(post => {
+                        if (post.id === postId) {
+                            return {
+                                ...post,
+                                likes: [...post.likes, { id: 'optimistic', authorId: auth.userId, postId }],
+                            };
+                        }
+                        return post;
+                    });
+                });
             }
 
-            return { previousPosts, previousUserPosts, previousPost };
+            return { previousPosts, previousUserPosts, previousPost, previousFollowingPosts };
         },
         onError: (error, _variables, previousState) => {
             toast.error(error.message);
@@ -115,16 +130,18 @@ const usePostMutation = ({ post, onPostDeleteSuccess }: usePostMutationParams) =
             void context.posts.getOne.invalidate({ postId: post.id });
         },
         onMutate: async ({ postId }) => {
-            const [previousPosts, previousUserPosts, previousPost] = [
+            const [previousPosts, previousUserPosts, previousPost, previousFollowingPosts] = [
                 context.posts.getAll.getData(),
                 context.posts.getUserPosts.getData({ username: post.author.username }),
                 context.posts.getOne.getData({ postId }),
+                context.posts.getFollowingPosts.getData(),
             ];
             if (auth.userId) {
                 await Promise.all([
                     context.posts.getAll.cancel(),
                     context.posts.getUserPosts.cancel({ username: post.author.username }),
                     context.posts.getOne.cancel({ postId }),
+                    context.posts.getFollowingPosts.cancel(),
                 ]);
 
                 context.posts.getAll.setData(undefined, old => {
@@ -155,15 +172,28 @@ const usePostMutation = ({ post, onPostDeleteSuccess }: usePostMutationParams) =
                     if (!old) return old;
                     return { ...old, likes: old.likes.filter(like => like.authorId !== auth.userId) };
                 });
+
+                context.posts.getFollowingPosts.setData(undefined, old => {
+                    return old?.map(post => {
+                        if (post.id === postId) {
+                            return {
+                                ...post,
+                                likes: post.likes.filter(like => like.authorId !== auth.userId),
+                            };
+                        }
+                        return post;
+                    });
+                });
             }
 
-            return { previousPosts, previousUserPosts, previousPost };
+            return { previousPosts, previousUserPosts, previousPost, previousFollowingPosts };
         },
         onError: (error, _variables, previousState) => {
             toast.error(error.message);
             context.posts.getAll.setData(undefined, previousState?.previousPosts);
             context.posts.getUserPosts.setData({ username: post.author.username }, previousState?.previousUserPosts);
             context.posts.getOne.setData({ postId: post.id }, previousState?.previousPost);
+            context.posts.getFollowingPosts.setData(undefined, previousState?.previousFollowingPosts);
         },
     });
 
