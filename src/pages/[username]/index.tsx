@@ -24,19 +24,19 @@ const ProfilePage: NextPage = () => {
 
     const getUser = api.users.get.useQuery({ username }, { enabled: router.isReady });
     const getUserPosts = api.posts.getUserPosts.useQuery({ username }, { enabled: router.isReady });
-    const follows = api.follows.getForUser.useQuery(
+    const follows = api.follows.getIdsForUser.useQuery(
         { userId: getUser.data?.id as string },
         { enabled: getUser.isSuccess }
     );
 
     const createFollow = api.follows.create.useMutation({
         onSuccess: () => {
-            void context.follows.getForUser.invalidate({ userId: getUser.data?.id as string });
+            void context.follows.getIdsForUser.invalidate({ userId: getUser.data?.id as string });
         },
         onMutate: async ({ userId }) => {
-            await context.follows.getForUser.cancel();
-            const previousFollows = context.follows.getForUser.getData({ userId });
-            context.follows.getForUser.setData({ userId }, prev => {
+            await context.follows.getIdsForUser.cancel();
+            const previousFollows = context.follows.getIdsForUser.getData({ userId });
+            context.follows.getIdsForUser.setData({ userId }, prev => {
                 if (!prev || !getCurrentUser.data) return prev;
                 return {
                     ...prev,
@@ -47,18 +47,18 @@ const ProfilePage: NextPage = () => {
         },
         onError: (err, variables, prev) => {
             toast.error(err.message);
-            context.follows.getForUser.setData(variables, prev);
+            context.follows.getIdsForUser.setData(variables, prev);
         },
     });
 
     const deleteFollow = api.follows.delete.useMutation({
         onSuccess: () => {
-            void context.follows.getForUser.invalidate({ userId: getUser.data?.id as string });
+            void context.follows.getIdsForUser.invalidate({ userId: getUser.data?.id as string });
         },
         onMutate: async ({ userId }) => {
-            await context.follows.getForUser.cancel();
-            const previousFollows = context.follows.getForUser.getData({ userId });
-            context.follows.getForUser.setData({ userId }, prev => {
+            await context.follows.getIdsForUser.cancel();
+            const previousFollows = context.follows.getIdsForUser.getData({ userId });
+            context.follows.getIdsForUser.setData({ userId }, prev => {
                 if (!prev || !getCurrentUser.data) return prev;
                 return {
                     ...prev,
@@ -69,7 +69,7 @@ const ProfilePage: NextPage = () => {
         },
         onError: (err, variables, prev) => {
             toast.error(err.message);
-            context.follows.getForUser.setData(variables, prev);
+            context.follows.getIdsForUser.setData(variables, prev);
         },
     });
 
@@ -169,6 +169,16 @@ const ProfilePage: NextPage = () => {
                                     <span className='ml-2 bg-gray-100 px-0.5 text-xs'>Follows you</span>
                                 )}
                             </p>
+                            <div className='mt-3 text-black'>
+                                <span className='cursor-pointer text-sm hover:underline'>
+                                    <span className='font-bold'>{follows.data?.following.length ?? '~'}</span>{' '}
+                                    <span className='text-gray-500'>Following</span>
+                                </span>
+                                <span className='cursor-pointer pl-4 text-sm hover:underline'>
+                                    <span className='font-bold'>{follows.data?.followers.length ?? '~'}</span>{' '}
+                                    <span className='text-gray-500'>Followers</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>

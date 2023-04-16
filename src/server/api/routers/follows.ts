@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { createTRPCRouter, privateProcedure, publicProcedure } from '~/server/api/trpc';
 
 const follows = createTRPCRouter({
-    getForUser: publicProcedure.input(z.object({ userId: z.string() })).query(async ({ ctx, input }) => {
+    getIdsForUser: publicProcedure.input(z.object({ userId: z.string() })).query(async ({ ctx, input }) => {
         const [following, followers] = await Promise.all([
             ctx.prisma.follow.findMany({ where: { followerId: input.userId } }),
             ctx.prisma.follow.findMany({ where: { followingId: input.userId } }),
@@ -12,10 +12,6 @@ const follows = createTRPCRouter({
             following: following.map(follow => follow.followingId),
             followers: followers.map(follow => follow.followerId),
         };
-    }),
-    getFollowing: privateProcedure.query(async ({ ctx }) => { 
-        const follows = await ctx.prisma.follow.findMany({ where: { followerId: ctx.auth.userId } });
-        return follows.map(follow => follow.followingId);
     }),
     create: privateProcedure.input(z.object({ userId: z.string() })).mutation(async ({ ctx, input }) => {
         const follow = await ctx.prisma.follow.findFirst({
