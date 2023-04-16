@@ -89,7 +89,12 @@ const OnePost: NextPage = () => {
             </Head>
             <Layout>
                 <div className='border-x-[1px] border-solid border-gray-200'>
-                    <Post post={{ ...getPost.data, _count: { comments: getComments.data?.length as number } }} />
+                    <Post
+                        post={{ ...getPost.data, _count: { comments: getComments.data?.length as number } }}
+                        onPostDeleteSuccess={() => {
+                            void router.push('/');
+                        }}
+                    />
                 </div>
 
                 {auth.isSignedIn && (
