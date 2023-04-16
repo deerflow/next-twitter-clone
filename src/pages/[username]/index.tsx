@@ -2,8 +2,6 @@ import { type NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { api } from '~/utils/api';
 import Layout from '~/components/Layout';
-import { AiOutlineArrowLeft } from 'react-icons/ai';
-import Link from 'next/link';
 import Image from 'next/image';
 import Button from '~/components/Button';
 import { useAuth } from '@clerk/nextjs';
@@ -14,6 +12,8 @@ import PostsList from '~/components/PostsList';
 import Page404 from '../404';
 import EditProfileModal from '~/components/EditProfileModal';
 import toast from 'react-hot-toast';
+import GoBackButton from '~/components/GoBackButton';
+import Link from 'next/link';
 
 const ProfilePage: NextPage = () => {
     const context = api.useContext();
@@ -111,12 +111,7 @@ const ProfilePage: NextPage = () => {
             {PageHead}
             <Layout>
                 <div className='h-13 flex items-center border-[1px] border-t-0 border-solid border-gray-200'>
-                    <Link
-                        href='/'
-                        className='ml-2 mr-6 rounded-full p-2 transition-colors duration-200 hover:bg-gray-200'
-                    >
-                        <AiOutlineArrowLeft />
-                    </Link>
+                    <GoBackButton href='/' />
                     <div className='flex flex-col justify-evenly'>
                         <h1 className='text-xl font-semibold'>{getUser.data?.username}</h1>
                         <p className='text-sm text-gray-600'>
@@ -170,14 +165,20 @@ const ProfilePage: NextPage = () => {
                                 )}
                             </p>
                             <div className='mt-3 text-black'>
-                                <span className='cursor-pointer text-sm hover:underline'>
+                                <Link
+                                    href={`/${getUser.data?.username as string}/following`}
+                                    className='text-sm hover:underline'
+                                >
                                     <span className='font-bold'>{follows.data?.following.length ?? '~'}</span>{' '}
                                     <span className='text-gray-500'>Following</span>
-                                </span>
-                                <span className='cursor-pointer pl-4 text-sm hover:underline'>
+                                </Link>
+                                <Link
+                                    href={`/${getUser.data?.username as string}/followers`}
+                                    className='pl-4 text-sm hover:underline'
+                                >
                                     <span className='font-bold'>{follows.data?.followers.length ?? '~'}</span>{' '}
                                     <span className='text-gray-500'>Followers</span>
-                                </span>
+                                </Link>
                             </div>
                         </div>
                     </div>
