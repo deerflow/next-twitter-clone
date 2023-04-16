@@ -163,7 +163,12 @@ const ProfilePage: NextPage = () => {
                         </div>
                         <div className='mt-3'>
                             <h1 className='text-xl font-bold'>{getUser.data?.username}</h1>
-                            <p className='text-sm text-gray-500'>@{getUser.data?.username}</p>
+                            <p className='items-center text-sm text-gray-600'>
+                                <span>@{getUser.data?.username}</span>
+                                {isCurrentUserFollowed && (
+                                    <span className='ml-2 bg-gray-100 px-0.5 text-xs'>Follows you</span>
+                                )}
+                            </p>
                         </div>
                     </div>
                 </div>
