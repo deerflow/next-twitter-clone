@@ -44,26 +44,24 @@ const Followers: NextPage = () => {
                                 <p className='text-sm text-gray-600'>@{getUser.data?.username}</p>
                             </div>
                         </div>
-                        {auth.isSignedIn && (
-                            <ul className='mt-1 flex justify-around'>
-                                <li className='block flex-1'>
-                                    <Link
-                                        href={`/${username}/followers`}
-                                        className='flex w-full justify-center p-3.5 font-bold transition-colors duration-200 hover:bg-gray-200'
-                                    >
-                                        Followers
-                                    </Link>
-                                </li>
-                                <li className='block flex-1'>
-                                    <Link
-                                        href={`/${username}/following`}
-                                        className='flex w-full justify-center p-3.5 transition-colors duration-200 hover:bg-gray-200'
-                                    >
-                                        Following
-                                    </Link>
-                                </li>
-                            </ul>
-                        )}
+                        <ul className='mt-1 flex justify-around'>
+                            <li className='block flex-1'>
+                                <Link
+                                    href={`/${username}/followers`}
+                                    className='flex w-full justify-center p-3.5 font-bold transition-colors duration-200 hover:bg-gray-200'
+                                >
+                                    Followers
+                                </Link>
+                            </li>
+                            <li className='block flex-1'>
+                                <Link
+                                    href={`/${username}/following`}
+                                    className='flex w-full justify-center p-3.5 transition-colors duration-200 hover:bg-gray-200'
+                                >
+                                    Following
+                                </Link>
+                            </li>
+                        </ul>
                     </header>
                     <FollowsList follows={getFollowers.data} isLoading={getFollowers.isLoading} />
                 </div>

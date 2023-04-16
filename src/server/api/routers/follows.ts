@@ -30,9 +30,9 @@ const follows = createTRPCRouter({
     }),
     getFollowingForUser: publicProcedure.input(z.object({ userId: z.string() })).query(async ({ ctx, input }) => {
         const followers = await ctx.prisma.follow.findMany({ where: { followerId: input.userId } });
-        const users = await clerkClient.users.getUserList({ userId: followers.map(follower => follower.followerId) });
+        const users = await clerkClient.users.getUserList({ userId: followers.map(follower => follower.followingId) });
         return followers.map(follower => {
-            const user = users.find(user => user.id === follower.followerId);
+            const user = users.find(user => user.id === follower.followingId);
             if (!user) throw new TRPCError({ message: 'user not found', code: 'NOT_FOUND' });
             return {
                 id: user.id,
