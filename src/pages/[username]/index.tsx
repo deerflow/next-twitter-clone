@@ -102,7 +102,7 @@ const ProfilePage: NextPage = () => {
         return <Page404 />;
     }
 
-    if (!auth.isLoaded || getUser.isLoading || getCurrentUser.isLoading) {
+    if (!auth.isLoaded || getUser.isLoading || getCurrentUser.isLoading || follows.isLoading) {
         return <LoadingPage>{PageHead}</LoadingPage>;
     }
 

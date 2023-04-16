@@ -30,7 +30,7 @@ const Post: FC<Props> = ({ post, clickable, onPostDeleteSuccess }) => {
         >
             <div className='mb-2 flex'>
                 <div className='flex w-full'>
-                    <Link href={`/${post.author.username}`}>
+                    <Link href={`/${post.author.username}`} onClick={e => e.stopPropagation()}>
                         <Image
                             src={post.author.avatar}
                             alt='Default user image'
