@@ -82,7 +82,11 @@ const Post: FC<Props> = ({ post, clickable, onPostDeleteSuccess }) => {
                     <div className='rounded-full p-2 transition-colors duration-100 group-hover:bg-blue-300/25 group-hover:text-blue-500'>
                         <FaRegComment />
                     </div>
-                    <p className='ml-1 text-sm transition-colors duration-100 group-hover:text-blue-500'>
+                    <p
+                        className={`ml-1 text-sm transition-colors duration-100 group-hover:text-blue-500 ${
+                            !post._count.comments ? 'opacity-0' : ''
+                        }`}
+                    >
                         {post._count.comments}
                     </p>
                 </div>
@@ -101,7 +105,7 @@ const Post: FC<Props> = ({ post, clickable, onPostDeleteSuccess }) => {
                     <p
                         className={`ml-1 text-sm transition-colors duration-100 ${
                             hasUserLikedThePost ? 'text-red-500' : 'group-hover:text-red-500'
-                        }`}
+                        } ${!post.likes?.length ? 'opacity-0' : ''}`}
                     >
                         {post.likes?.length || 0}
                     </p>
