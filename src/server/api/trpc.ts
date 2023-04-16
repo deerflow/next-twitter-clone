@@ -83,7 +83,7 @@ export const isLoggedInMiddleware = t.middleware(async ({ ctx, next }) => {
     const { auth, prisma } = ctx;
 
     if (!auth.userId) {
-        throw new TRPCError({ code: 'UNAUTHORIZED' });
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You need to be logged in to perform this action' });
     }
 
     return next({

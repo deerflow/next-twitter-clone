@@ -12,7 +12,7 @@ const posts = createTRPCRouter({
     getAll: publicProcedure.query(async ({ ctx }) => {
         const posts = await ctx.prisma.post.findMany({
             orderBy: { createdAt: 'desc' },
-            include: { image: true, _count: { select: { comments: true } } },
+            include: { image: true, likes: true, _count: { select: { comments: true } } },
         });
         const authors = await clerkClient.users.getUserList({ userId: posts.map(post => post.author) });
         const postsWithAuthors = posts.map(post => {
@@ -37,12 +37,15 @@ const posts = createTRPCRouter({
         const posts = await ctx.prisma.post.findMany({
             where: { author: user.id },
             orderBy: { createdAt: 'desc' },
-            include: { image: true, _count: { select: { comments: true } } },
+            include: { image: true, _count: { select: { comments: true } }, likes: true },
         });
         return posts.map(post => ({ ...post, author: user }));
     }),
     getOne: publicProcedure.input(z.object({ postId: z.string() })).query(async ({ ctx, input }) => {
-        const post = await ctx.prisma.post.findUnique({ where: { id: input.postId }, include: { image: true } });
+        const post = await ctx.prisma.post.findUnique({
+            where: { id: input.postId },
+            include: { image: true, likes: true },
+        });
         if (!post) throw new TRPCError({ message: 'Post not found', code: 'NOT_FOUND' });
         const author = await clerkClient.users.getUser(post.author);
         return {

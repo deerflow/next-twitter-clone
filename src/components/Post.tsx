@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import router from 'next/router';
-import { type FC } from 'react';
-import { AiOutlineDelete } from 'react-icons/ai';
+import { useMemo, type FC } from 'react';
+import { AiFillHeart, AiOutlineDelete, AiOutlineHeart } from 'react-icons/ai';
 import { FaRegComment } from 'react-icons/fa';
 import { type RouterOutput } from '~/server/api/root';
 import Spinner from './Spinner';
@@ -14,6 +14,12 @@ const Post: FC<Props> = ({ post, clickable }) => {
     const auth = useAuth();
     const context = api.useContext();
     const user = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
+
+    const hasUserLikedThePost = useMemo(
+        () => !!auth.userId && post.likes.map(like => like.authorId).includes(auth.userId),
+        [auth.userId, post.likes]
+    );
+
     const deletePost = api.posts.delete.useMutation({
         onMutate: async ({ postId }) => {
             await Promise.all([context.posts.getAll.cancel(), context.posts.getUserPosts.cancel()]);
@@ -48,6 +54,24 @@ const Post: FC<Props> = ({ post, clickable }) => {
                     { username: user.data?.username as string },
                     prev?.previousUserPosts
                 );
+        },
+    });
+
+    const createLike = api.likes.create.useMutation({
+        onSuccess: () => {
+            void context.posts.getAll.invalidate();
+            void context.posts.getUserPosts.invalidate({
+                username: user.data?.username,
+            });
+        },
+    });
+
+    const deleteLike = api.likes.delete.useMutation({
+        onSuccess: () => {
+            void context.posts.getAll.invalidate();
+            void context.posts.getUserPosts.invalidate({
+                username: user.data?.username,
+            });
         },
     });
 
@@ -108,13 +132,33 @@ const Post: FC<Props> = ({ post, clickable }) => {
                     className='mb-2 mt-1'
                 />
             )}
-            <div className='mb-1 text-gray-600'>
+            <div className='mb-1 flex text-gray-600'>
                 <div className='group flex w-fit items-center'>
                     <div className='rounded-full p-2 transition-colors duration-100 group-hover:bg-blue-300/25 group-hover:text-blue-500'>
                         <FaRegComment />
                     </div>
                     <p className='ml-1 text-sm transition-colors duration-100 group-hover:text-blue-500'>
                         {post._count.comments}
+                    </p>
+                </div>
+                <div
+                    className='group ml-8 flex w-fit cursor-pointer items-center'
+                    onClick={e => {
+                        e.stopPropagation();
+                        hasUserLikedThePost
+                            ? deleteLike.mutate({ postId: post.id })
+                            : createLike.mutate({ postId: post.id });
+                    }}
+                >
+                    <div className='rounded-full p-2 transition-colors duration-100 group-hover:bg-red-300/25 group-hover:text-red-500'>
+                        {hasUserLikedThePost ? <AiFillHeart className='text-red-500' /> : <AiOutlineHeart />}
+                    </div>
+                    <p
+                        className={`ml-1 text-sm transition-colors duration-100 ${
+                            hasUserLikedThePost ? 'text-red-500' : 'group-hover:text-red-500'
+                        }`}
+                    >
+                        {post.likes?.length || 0}
                     </p>
                 </div>
             </div>
