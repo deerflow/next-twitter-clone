@@ -11,8 +11,8 @@ const Layout: FCChildren<Props> = ({ children, left, right }) => {
     return (
         <div className='flex min-h-screen'>
             {left || <NavBar />}
-            <main className='w-[600px]'>{children}</main>
-            {right || <div className='flex-1' />}
+            <main className='w-[600px] max-md:w-[500px] max-sm:w-[380px] max-[460px]:w-[240px]'>{children}</main>
+            {right || <div className='flex-1 max-lg:hidden' />}
             {auth.isLoaded &&
                 !auth.isSignedIn &&
                 router.route !== '/users/sign-in' &&

@@ -13,7 +13,7 @@ const NavBar: FC = () => {
     const router = useRouter();
 
     return (
-        <nav className='sticky top-0 box-border flex h-screen flex-1 justify-center pt-6 text-xl'>
+        <nav className='sticky top-0 box-border flex h-screen flex-1 justify-center pt-6 text-xl max-md:w-fit max-md:flex-initial'>
             <div className='flex w-fit flex-col items-center justify-between'>
                 <ul className='w-full'>
                     <li>
@@ -29,8 +29,11 @@ const NavBar: FC = () => {
                             href='/'
                             className='my-0.5 flex w-fit items-center rounded-full py-3 pl-4 pr-5 transition-colors duration-200 hover:bg-gray-200'
                         >
-                            <AiOutlineHome className='mr-4 h-7 w-7' strokeWidth={router.route === '/' ? 24 : 4} />
-                            <p className={`${router.route === '/' ? 'font-bold' : ''}`}>Home</p>
+                            <AiOutlineHome
+                                className='mr-4 h-7 w-7 max-md:mr-0'
+                                strokeWidth={router.route === '/' ? 24 : 4}
+                            />
+                            <p className={`${router.route === '/' ? 'font-bold' : ''} max-md:hidden`}>Home</p>
                         </Link>
                     </li>
                     {auth.isSignedIn && (
@@ -40,7 +43,7 @@ const NavBar: FC = () => {
                                 className='my-0.5 flex w-fit items-center rounded-full py-3 pl-4 pr-5 transition-colors duration-200 hover:bg-gray-200'
                             >
                                 <AiOutlineUser
-                                    className='mr-4 h-7 w-7'
+                                    className='mr-4 h-7 w-7 max-md:mr-0'
                                     strokeWidth={
                                         router.query.username === getCurrentUser?.data?.username && !router.query.postId
                                             ? 24

@@ -122,7 +122,7 @@ const Home: NextPage = () => {
         <>
             <PageHead />
             <Layout>
-                <div className='w-[600px]'>
+                <div className='w-[600px] max-md:w-full'>
                     <header className='border-x-[1px] border-b-[1px] border-solid border-gray-200 pt-3'>
                         <h1 className='mb-3 ml-4 text-xl font-bold'>Home</h1>
                         {auth.isSignedIn && (
@@ -147,7 +147,6 @@ const Home: NextPage = () => {
                             onSubmit={e => {
                                 e.preventDefault();
                                 if (uploadedImage) {
-                                    console.log('image');
                                     if (!uploadedImageHeight)
                                         return toast.error('Image does not have required field height');
                                     createPost.mutate({
@@ -185,7 +184,7 @@ const Home: NextPage = () => {
                                         value={content}
                                         onChange={e => setContent(e.currentTarget.value)}
                                         placeholder="What's happening?"
-                                        className='mt-2.5 w-[424px] resize-none text-xl placeholder-gray-600 outline-none'
+                                        className='max-lg:[w-full] mt-2.5 w-[424px] resize-none text-xl placeholder-gray-600 outline-none'
                                         minLength={1}
                                         maxLength={280}
                                         required

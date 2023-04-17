@@ -16,7 +16,6 @@ const Post: FC<Props> = ({ post, clickable, onPostDeleteSuccess }) => {
     const { setIsOpen } = useContext(LoginModalContext);
     const user = api.users.getCurrent.useQuery(undefined, { enabled: auth.isSignedIn });
     const { deletePost, createLike, deleteLike } = usePostMutation({ post, onPostDeleteSuccess });
-    
 
     const hasUserLikedThePost = useMemo(
         () => !!auth.userId && post.likes && post.likes.map(like => like.authorId).includes(auth.userId),
@@ -33,7 +32,11 @@ const Post: FC<Props> = ({ post, clickable, onPostDeleteSuccess }) => {
         >
             <div className='mb-2 flex'>
                 <div className='flex w-full'>
-                    <Link href={`/${post.author.username}`} onClick={e => e.stopPropagation()}>
+                    <Link
+                        href={`/${post.author.username}`}
+                        onClick={e => e.stopPropagation()}
+                        className='max-sm:hidden'
+                    >
                         <Image
                             src={post.author.avatar}
                             alt='Default user image'

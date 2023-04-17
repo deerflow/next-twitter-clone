@@ -1,16 +1,15 @@
-/* eslint-disable react/no-unescaped-entities */
 import Link from 'next/link';
 import { type FC } from 'react';
 
 const LoginBar: FC = () => {
     return (
         <div className='fixed bottom-0 flex w-full justify-between bg-blue-400 p-2 text-white'>
-            <div className='flex-1' />
-            <div className='w-[600px]'>
-                <p className='text-xl font-bold'>Don't miss out what's happening.</p>
+            <div className='flex-1 max-lg:hidden' />
+            <div className='flex w-[600px] flex-col max-lg:w-full max-lg:flex-1 max-lg:items-center max-sm:hidden'>
+                <p className='text-xl font-bold'>{`Don't miss out what's happening.`}</p>
                 <p className='text-sm'>Twitty users are the first one to know. </p>
             </div>
-            <div className='flex flex-1 items-center'>
+            <div className='flex flex-1 items-center max-sm:justify-center'>
                 <div className='mr-3'>
                     <Link
                         href='/users/sign-in'
