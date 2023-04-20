@@ -117,6 +117,7 @@ const EditProfileModal: FC<Props> = ({ setIsEditing, user }) => {
                         alt='Profile picture'
                         width={100}
                         height={100}
+                        unoptimized
                     />
                     <input
                         id='avatar-upload'

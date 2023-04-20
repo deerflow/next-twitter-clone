@@ -7,7 +7,7 @@ const LoadingPage: FCChildren = ({ children }) => {
         <>
             {children}
             <div className='flex h-screen items-center justify-center'>
-                <Image src={mainIcon as StaticImageData} alt='Main Icon' width={64} height={64} />
+                <Image src={mainIcon as StaticImageData} alt='Main Icon' width={64} height={64} unoptimized />
             </div>
         </>
     );

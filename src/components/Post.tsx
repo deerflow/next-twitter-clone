@@ -43,6 +43,7 @@ const Post: FC<Props> = ({ post, clickable, onPostDeleteSuccess }) => {
                             width={48}
                             height={48}
                             className='mr-3 h-12 w-12 rounded-full object-cover object-center'
+                            unoptimized
                         />
                     </Link>
 
@@ -81,6 +82,7 @@ const Post: FC<Props> = ({ post, clickable, onPostDeleteSuccess }) => {
                     blurDataURL={post.image.blurDataUrl}
                     placeholder='blur'
                     className='mb-2 mt-1'
+                    unoptimized
                 />
             )}
             <div className='mb-1 flex text-gray-600'>

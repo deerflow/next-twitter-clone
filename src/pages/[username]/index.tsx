@@ -130,6 +130,7 @@ const ProfilePage: NextPage = () => {
                                 width={120}
                                 height={120}
                                 className='h-[120px] w-[120px] rounded-full object-cover object-center'
+                                unoptimized
                             />
                             <div>
                                 {getCurrentUser.data && getCurrentUser.data?.id === getUser.data?.id ? (

@@ -21,7 +21,7 @@ const NavBar: FC = () => {
                             href='/'
                             className='ml-1.5 flex w-fit rounded-full p-2 transition-colors duration-200 hover:bg-gray-200'
                         >
-                            <Image src={logo as StaticImageData} alt='Main Logo' width={36} />
+                            <Image src={logo as StaticImageData} alt='Main Logo' width={36} unoptimized />
                         </Link>
                     </li>
                     <li>
@@ -75,6 +75,7 @@ const NavBar: FC = () => {
                                 width={48}
                                 height={48}
                                 className='h-12 w-12 rounded-full'
+                                unoptimized
                             />
                             <div className='ml-2'>
                                 <p className='text-base font-semibold leading-4'>{getCurrentUser.data?.username}</p>

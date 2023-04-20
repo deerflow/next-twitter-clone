@@ -69,6 +69,7 @@ const FollowsList: FC<Props> = ({ follows, isLoading }) => {
                                 width={48}
                                 height={48}
                                 className='mr-3 h-12 w-12 rounded-full object-cover object-center'
+                                unoptimized
                             />
                         </Link>
                         <div>
