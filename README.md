@@ -1,28 +1,23 @@
-# Create T3 App
+# Portfolio
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+<img src="./github/react.svg"  width="32" height="32">&nbsp;&nbsp;&nbsp;<img src="./github/nextjs.svg"  width="32" height="32">&nbsp;&nbsp;&nbsp;<img src="./github/trpc.svg"  width="32" height="32">&nbsp;&nbsp;&nbsp;<img src="./github/prisma.svg"  width="32" height="32">&nbsp;&nbsp;&nbsp;<img src="./github/tailwind.svg"  width="32" height="32">&nbsp;&nbsp;&nbsp;<img src="./github/typescript.svg"  width="32" height="32">
 
-## What's next? How do I make an app with this?
+Twitter Clone App built with Next.js, tRPC, Prisma, Tailwind and TypeScript
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Features
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+-   Create, delete tweets (280 characters max) and add images/GIFs to tweets (Uploaded to ImageKit CDN)
+-   Tweets feed (every tweets or followed users tweets)
+-   Like and comment tweets
+-   Follow users
+-   Update your profile
+-   Authentication (Built with Clerk)
+-   Rate limiting (Built with Upstash)
+-   Optimistic UI updates
+-   Like twitter, this is a Single Page Application (No server-side rendering or static pages)
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+[Try me](https://twitty-nextjs.vercel.app/)
 
-## Learn More
-
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+<img src="./github/1.png">
+<img src="./github/2.png">
+<img src="./github/3.png">
