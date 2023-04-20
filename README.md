@@ -2,7 +2,7 @@
 
 <img src="./github/react.svg"  width="32" height="32">&nbsp;&nbsp;&nbsp;<img src="./github/nextjs.svg"  width="32" height="32">&nbsp;&nbsp;&nbsp;<img src="./github/trpc.svg"  width="32" height="32">&nbsp;&nbsp;&nbsp;<img src="./github/prisma.svg"  width="32" height="32">&nbsp;&nbsp;&nbsp;<img src="./github/tailwind.svg"  width="32" height="32">&nbsp;&nbsp;&nbsp;<img src="./github/typescript.svg"  width="32" height="32">
 
-Twitter Clone App built with Next.js, tRPC, Prisma, Tailwind and TypeScript
+Twitter Clone App built with Next.js, tRPC, Prisma, Tailwind and TypeScript.
 
 ## Features
 
